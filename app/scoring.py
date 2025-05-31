@@ -5,6 +5,97 @@ from sklearn.metrics.pairwise import cosine_similarity
 from typing import List, Tuple, Set, Dict
 import numpy as np
 
+
+def get_company_modifier(company_name: str) -> int:
+    """Return company reputation modifier"""
+    company_lower = company_name.lower()
+    
+    # Big tech companies (harder to get in)
+    if any(big_tech in company_lower for big_tech in ['meta', 'google', 'amazon', 'apple', 'microsoft', 'netflix']):
+        return -15
+    
+    # Startups (easier/more flexible)
+    if any(startup in company_lower for startup in ['startup', 'early-stage', 'seed']):
+        return +10
+    
+    # Default
+    return 0
+
+def calculate_advanced_score(resume_text: str, job_text: str, company_name: str) -> Dict:
+    """Calculate comprehensive multi-dimensional score"""
+    
+    # 1. Extract data from both texts
+    resume_skills = extract_enhanced_skills(resume_text)
+    job_skills = extract_enhanced_skills(job_text)
+    resume_exp = extract_experience_level(resume_text)
+    job_exp = extract_experience_level(job_text)
+    
+    # 2. Calculate semantic similarity (0-1 scale)
+    semantic_score = calculate_semantic_similarity(resume_text, job_text)
+    
+    # 3. Calculate weighted skills score
+    skills_score = 0
+    skills_breakdown = {}
+    
+    for category in resume_skills.keys():
+        resume_count = resume_skills[category]['count']
+        job_count = job_skills[category]['count']
+        weight = resume_skills[category]['weight']
+        
+        if job_count > 0:
+            category_score = min(100, (resume_count / job_count) * 100)
+        else:
+            category_score = 100 if resume_count > 0 else 0
+            
+        skills_score += category_score * weight
+        skills_breakdown[category] = {
+            'resume_skills': resume_count,
+            'job_requirements': job_count,
+            'score': round(category_score, 1),
+            'weight': weight
+        }
+    
+    # 4. Experience level matching
+    exp_bonus = 0
+    if resume_exp['level'] == job_exp['level']:
+        exp_bonus = 10
+    elif (resume_exp['level'] == 'senior' and job_exp['level'] in ['mid', 'junior']):
+        exp_bonus = 5
+    
+    # Years experience bonus/penalty
+    years_diff = resume_exp['years'] - job_exp['years']
+    if years_diff >= 0:
+        exp_bonus += min(10, years_diff * 2)
+    else:
+        exp_bonus += max(-15, years_diff * 3)
+    
+    # 5. Combine all scores
+    base_score = int((skills_score * 0.6) + (semantic_score * 100 * 0.4))
+    overall_score = min(100, max(0, base_score + exp_bonus))
+    
+    # 6. Apply company modifier
+    company_mod = get_company_modifier(company_name)
+    final_score = min(100, max(0, overall_score + company_mod))
+    
+    # 7. Generate explanation
+    explanation = f"Skills match: {skills_score:.1f}%, Semantic similarity: {semantic_score*100:.1f}%, Experience bonus: {exp_bonus}, Company modifier: {company_mod}"
+    
+    return {
+        'overall_score': overall_score,
+        'semantic_similarity': round(semantic_score, 3),
+        'skills_breakdown': skills_breakdown,
+        'experience_match': {
+            'resume_years': resume_exp['years'],
+            'resume_level': resume_exp['level'],
+            'job_years': job_exp['years'],
+            'job_level': job_exp['level'],
+            'experience_bonus': exp_bonus
+        },
+        'company_modifier': company_mod,
+        'final_score': final_score,
+        'explanation': explanation
+    }
+
 # Load models
 try:
     nlp = spacy.load("en_core_web_sm")
