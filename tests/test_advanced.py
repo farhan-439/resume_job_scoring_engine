@@ -1,22 +1,23 @@
-from app.scoring import extract_experience_level, extract_enhanced_skills_v2, calculate_semantic_similarity_with_confidence
+from app.scoring import extract_enhanced_experience_level, extract_enhanced_skills_v2, calculate_semantic_similarity_with_confidence
 
-# Test data with more complex skills
-resume_text = "I am a senior software engineer with 8 years of experience in Python and 5 years with React. I have led teams and mentored junior developers. Expert in Django and AWS. Strong background in machine learning and natural language processing. Experience with full stack development and microservices architecture."
+# Test data designed to test the semantic matching
+resume_text = "Software developer with 8 years of experience in Python and React. I have led teams and mentored junior developers. Expert in Django and AWS. Strong background in machine learning."
 
-job_text = "Looking for a senior backend developer with Python experience and team leadership skills. ML background preferred."
+job_text = "Looking for a senior backend engineer with Python experience and team leadership skills. 5+ years experience required."
 
-# Test functions
-print("=== Experience Level Extraction ===")
-exp_data = extract_experience_level(resume_text)
-print(f"Experience data: {exp_data}")
+# Test the enhanced experience extraction
+print("=== Enhanced Experience Level Extraction ===")
+resume_exp = extract_enhanced_experience_level(resume_text)
+job_exp = extract_enhanced_experience_level(job_text)
+
+print(f"Resume experience: {resume_exp}")
+print(f"Job experience: {job_exp}")
 
 print("\n=== Enhanced Skills Extraction V2 ===")
 skills_data = extract_enhanced_skills_v2(resume_text)
 for category, data in skills_data.items():
-    if data['count'] > 0:  # Only show categories with skills
-        print(f"\n{category.upper()} ({data['count']} skills):")
-        for skill in data['skills']:
-            print(f"  - {skill['skill']} (matched as: {skill['matched_as']})")
+    if data['count'] > 0:
+        print(f"{category}: {data['count']} skills")
 
 print("\n=== Semantic Similarity with Confidence ===")
 similarity, confidence = calculate_semantic_similarity_with_confidence(resume_text, job_text)
