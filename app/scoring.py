@@ -30,8 +30,11 @@ def calculate_advanced_score(resume_text: str, job_text: str, company_name: str)
     resume_exp = extract_experience_level(resume_text)
     job_exp = extract_experience_level(job_text)
     
-    # 2. Calculate semantic similarity (0-1 scale)
-    semantic_score = calculate_semantic_similarity(resume_text, job_text)
+    # 2. Calculate semantic similarity with confidence (0-1 scale)
+    semantic_score, confidence = calculate_semantic_similarity_with_confidence(resume_text, job_text)
+
+    # Apply confidence weighting to semantic score
+    confidence_weighted_semantic = semantic_score * confidence
     
     # 3. Calculate weighted skills score
     skills_score = 0
@@ -69,8 +72,8 @@ def calculate_advanced_score(resume_text: str, job_text: str, company_name: str)
     else:
         exp_bonus += max(-15, years_diff * 3)
     
-    # 5. Combine all scores
-    base_score = int((skills_score * 0.6) + (semantic_score * 100 * 0.4))
+# 5. Combine all scores (with confidence weighting)
+    base_score = int((skills_score * 0.6) + (confidence_weighted_semantic * 100 * 0.4))
     overall_score = min(100, max(0, base_score + exp_bonus))
     
     # 6. Apply company modifier
@@ -78,7 +81,7 @@ def calculate_advanced_score(resume_text: str, job_text: str, company_name: str)
     final_score = min(100, max(0, overall_score + company_mod))
     
     # 7. Generate explanation
-    explanation = f"Skills match: {skills_score:.1f}%, Semantic similarity: {semantic_score*100:.1f}%, Experience bonus: {exp_bonus}, Company modifier: {company_mod}"
+    explanation = f"Skills match: {skills_score:.1f}%, Semantic similarity: {semantic_score*100:.1f}% (confidence: {confidence:.2f}), Experience bonus: {exp_bonus}, Company modifier: {company_mod}"
     
     return {
         'overall_score': overall_score,
@@ -99,11 +102,19 @@ def calculate_advanced_score(resume_text: str, job_text: str, company_name: str)
 # Load models
 try:
     nlp = spacy.load("en_core_web_sm")
-    sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
+    # Upgrade to better model
+    sentence_model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+    print("✅ Loaded all-mpnet-base-v2 (better than MiniLM)")
 except Exception as e:
     print(f"Model loading error: {e}")
-    nlp = None
-    sentence_model = None
+    try:
+        # Fallback to current model
+        sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
+        print("⚠️ Fallback to MiniLM model")
+    except:
+        sentence_model = None
+        nlp = None
+
 
 # Enhanced skill categories with weights
 SKILL_CATEGORIES = {
@@ -223,10 +234,10 @@ def extract_skill_context(text: str, skill: str) -> Dict[str, any]:
     
     return context
 
-def calculate_semantic_similarity(resume_text: str, job_text: str) -> float:
-    """Calculate semantic similarity between resume and job description"""
+def calculate_semantic_similarity_with_confidence(resume_text: str, job_text: str) -> Tuple[float, float]:
+    """Calculate semantic similarity with confidence score"""
     if not sentence_model:
-        return 0.0
+        return 0.0, 0.0
     
     try:
         # Create embeddings
@@ -235,6 +246,29 @@ def calculate_semantic_similarity(resume_text: str, job_text: str) -> float:
         
         # Calculate cosine similarity
         similarity = cosine_similarity(resume_embedding, job_embedding)[0][0]
-        return float(similarity)
+        
+        # Calculate confidence based on text quality and length
+        confidence = calculate_confidence_score(resume_text, job_text)
+        
+        return float(similarity), float(confidence)
     except:
-        return 0.0
+        return 0.0, 0.0
+
+def calculate_confidence_score(resume_text: str, job_text: str) -> float:
+    """Calculate confidence score for semantic similarity"""
+    # Text length factor (longer texts generally give more reliable embeddings)
+    resume_length_factor = min(len(resume_text.split()) / 100, 1.0)  # Normalize to 100 words
+    job_length_factor = min(len(job_text.split()) / 50, 1.0)        # Normalize to 50 words
+    
+    # Text quality factor (professional terms, proper grammar indicators)
+    professional_terms = ['experience', 'skills', 'responsible', 'developed', 'managed', 'led', 'implemented']
+    resume_quality = sum(1 for term in professional_terms if term in resume_text.lower()) / len(professional_terms)
+    job_quality = sum(1 for term in professional_terms if term in job_text.lower()) / len(professional_terms)
+    
+    # Combined confidence score
+    confidence = (resume_length_factor * 0.3 + 
+                 job_length_factor * 0.3 + 
+                 resume_quality * 0.2 + 
+                 job_quality * 0.2)
+    
+    return min(confidence, 1.0)

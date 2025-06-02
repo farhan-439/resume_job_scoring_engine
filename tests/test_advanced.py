@@ -1,4 +1,4 @@
-from app.scoring import extract_experience_level, extract_enhanced_skills, calculate_semantic_similarity
+from app.scoring import extract_experience_level, extract_enhanced_skills, calculate_semantic_similarity_with_confidence
 
 # Test data
 resume_text = "I am a senior software engineer with 8 years of experience in Python and 5 years with React. I have led teams and mentored junior developers. Expert in Django and AWS."
@@ -15,6 +15,7 @@ skills_data = extract_enhanced_skills(resume_text)
 for category, data in skills_data.items():
     print(f"{category}: {data}")
 
-print("\n=== Semantic Similarity ===")
-similarity = calculate_semantic_similarity(resume_text, job_text)
+print("\n=== Semantic Similarity with Confidence ===")
+similarity, confidence = calculate_semantic_similarity_with_confidence(resume_text, job_text)
 print(f"Similarity score: {similarity}")
+print(f"Confidence score: {confidence}")

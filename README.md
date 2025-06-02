@@ -140,5 +140,3 @@ final_score = overall_score + company_modifier
 - Minimum text length requirements
 - Automatic text cleaning and preprocessing
 - Comprehensive error handling and informative error messages
-
-## 🔬 Testing the Application
