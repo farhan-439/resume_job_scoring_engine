@@ -1,6 +1,12 @@
 # Resume Job Scoring Engine
 
-An industry-standard AI-powered resume-job matching system implementing best practices from CareerBuilder, LinkedIn, and major recruitment platforms. Achieves 73% semantic similarity for perfect matches with production-ready performance.
+A resume-job matching system implementing best practices from CareerBuilder, LinkedIn, and major recruitment platforms. Achieves 73% semantic similarity for perfect matches with production-ready performance.
+
+My model distinguishes between <span style="color:#5DADE2;">**"5 years Python experience"**</span> vs <span style="color:#5DADE2;">**"familiar with Python basics"**</span>, <span style="color:#5DADE2;">**distinguishes "i am a senior developer"**</span> with <span style="color:#5DADE2;">**"worked with senior developers"**</span> for a "senior" keyword, and <span style="color:#5DADE2;">**connects "team leadership requirements"**</span> with <span style="color:#5DADE2;">**"managed teams of 5+ engineers"**</span>
+
+<span style="color:#5DADE2;">**Advanced Understanding:**</span> Recognizes <span style="color:#5DADE2;">**skill aliases**</span> (“js” → “javascript”, “k8s” → “kubernetes”), <span style="color:#5DADE2;">**detects compound skills**</span> (“machine learning”, “full stack development”), <span style="color:#5DADE2;">**infers seniority levels**</span> (8 years experience → senior level without explicit mention), <span style="color:#5DADE2;">**understands job title synonyms**</span> (“developer” ≈ “engineer” ≈ “programmer”), <span style="color:#5DADE2;">**extracts technical depth indicators**</span> (“architecture”, “scalability”, “system design”), <span style="color:#5DADE2;">**identifies overqualification scenarios**</span> (“Principal engineer” applying to “entry-level position”), <span style="color:#5DADE2;">**also underqualification scenarios**</span>, ("Recent graduate applying to Senior roles") <span style="color:#5DADE2;">**processes career transitions**</span> (“data scientist” → “backend engineer” with transferable Python skills), <span style="color:#5DADE2;">**weighs skill categories**</span> (programming languages 30% > soft skills 10%), <span style="color:#5DADE2;">**applies company hiring standards**</span> (Google -15 points, startups +10 points), and <span style="color:#5DADE2;">**provides confidence-weighted scoring**</span> with <span style="color:#5DADE2;">** TF-IDF fallback**</span> when semantic confidence is low.
+
+**Note:** We only leverage a **local Sentence Transformers model (all-mpnet-base-v2)** to achieve an average response time of about **42 ms (versus 2+ seconds with GPT)** and completely **eliminate per-request costs**. If even **higher semantic accuracy** is required—especially in complex or multimodal scenarios—we can introduce a **second stage that calls the GPT API**. In practice, this **two-stage (or multimodel) setup** lets us perform a **fast, cost-effective local pass** and only incur the **higher latency and expense of GPT** when our **confidence score falls below a certain threshold**.
 
 ## 🚀 Key Features
 
@@ -16,13 +22,13 @@ An industry-standard AI-powered resume-job matching system implementing best pra
 
 ## 🏆 Performance Benchmarks
 
-| Metric                 | Industry Target | Our System     | Status              |
-| ---------------------- | --------------- | -------------- | ------------------- |
-| Perfect Match Accuracy | 50-70 points    | 56 points      | ✅ On Target        |
-| Skills Differentiation | 30-50 points    | 42 points      | ✅ Excellent        |
-| Semantic Understanding | >60% similarity | 73% similarity | ✅ Outstanding      |
-| Response Time          | <50ms           | 42ms average   | ✅ Production Ready |
-| Throughput             | >20 req/sec     | 24 req/sec     | ✅ Scalable         |
+| Metric                 | Industry Target | Our System     |
+| ---------------------- | --------------- | -------------- |
+| Perfect Match Accuracy | 50-70 points    | 56 points      |
+| Skills Differentiation | 30-50 points    | 42 points      |
+| Semantic Understanding | >60% similarity | 73% similarity |
+| Response Time          | <50ms           | 42ms average   |
+| Throughput             | >20 req/sec     | 24 req/sec     |
 
 ## 🛠️ Tech Stack
 
@@ -293,9 +299,7 @@ Performance:           24 req/sec, 42ms avg ✅
 - [ ] **Industry-Specific Models**: Customize weights by job sector
 - [ ] **Bias Detection**: Fairness metrics and demographic parity
 - [ ] **Real-time Learning**: Feedback incorporation system
-- [ ] **Multi-language Support**: Expand beyond English
 - [ ] **Education Matching**: Degree and certification analysis
-- [ ] **Salary Prediction**: Compensation range estimation
 
 ## 📄 License
 
