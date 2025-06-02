@@ -37,7 +37,7 @@ def calculate_hybrid_semantic_similarity(resume_text: str, job_text: str) -> Tup
     Returns: (similarity_score, confidence, method_used)
     """
     # Try semantic similarity first
-    semantic_score, confidence = calculate_semantic_similarity_with_confidence(resume_text, job_text)
+    semantic_score, confidence = calculate_context_aware_semantic_similarity(resume_text, job_text)
     
     # Define confidence threshold for fallback
     CONFIDENCE_THRESHOLD = 0.3
@@ -468,15 +468,15 @@ def calculate_advanced_score(resume_text: str, job_text: str, company_name: str)
 # Load models
 try:
     nlp = spacy.load("en_core_web_sm")
-    # Upgrade to better model
-    sentence_model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
-    print("✅ Loaded all-mpnet-base-v2 (better than MiniLM)")
+    # Use a larger model with better context understanding
+    sentence_model = SentenceTransformer('sentence-transformers/all-MiniLM-L12-v2')
+    print("✅ Loaded all-MiniLM-L12-v2 (context-aware professional model)")
 except Exception as e:
     print(f"Model loading error: {e}")
     try:
-        # Fallback to current model
-        sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
-        print("⚠️ Fallback to MiniLM model")
+        # Fallback to your current model
+        sentence_model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+        print("⚠️ Fallback to mpnet model")
     except:
         sentence_model = None
         nlp = None
@@ -547,24 +547,219 @@ def extract_skill_context(text: str, skill: str) -> Dict[str, any]:
     
     return context
 
-def calculate_semantic_similarity_with_confidence(resume_text: str, job_text: str) -> Tuple[float, float]:
-    """Calculate semantic similarity with confidence score"""
+def preprocess_resume_context(text: str) -> str:
+    """Emphasize first-person achievements and filter out references to others"""
+    lines = text.split('.')
+    processed_lines = []
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # Emphasize first-person statements (these describe the candidate)
+        first_person_indicators = ['i have', 'i am', 'i led', 'i managed', 'i developed', 'i worked', 'my experience', 'my skills']
+        is_first_person = any(indicator in line.lower() for indicator in first_person_indicators)
+        
+        # De-emphasize references to others or requirements
+        other_references = ['junior developers', 'senior leadership', 'team members', 'looking for', 'seeking', 'requirements']
+        has_other_ref = any(ref in line.lower() for ref in other_references)
+        
+        if is_first_person and not has_other_ref:
+            # Boost first-person achievement statements
+            processed_lines.append(f"{line}. {line}")  # Duplicate important lines
+        elif not has_other_ref:
+            processed_lines.append(line)
+        # Skip lines that primarily reference others
+    
+    return '. '.join(processed_lines)
+
+def preprocess_job_context(text: str) -> str:
+    """Emphasize requirements and qualifications while filtering candidate references"""
+    lines = text.split('.')
+    processed_lines = []
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # Emphasize requirement statements
+        requirement_indicators = ['required', 'must have', 'should have', 'looking for', 'seeking', 'need', 'prefer']
+        is_requirement = any(indicator in line.lower() for indicator in requirement_indicators)
+        
+        # Filter out candidate-specific statements that might confuse matching
+        candidate_refs = ['candidate will', 'you will', 'your experience', 'your skills']
+        has_candidate_ref = any(ref in line.lower() for ref in candidate_refs)
+        
+        if is_requirement and not has_candidate_ref:
+            # Boost requirement statements
+            processed_lines.append(f"{line}. {line}")  # Duplicate important requirements
+        elif not has_candidate_ref:
+            processed_lines.append(line)
+    
+    return '. '.join(processed_lines)
+
+
+def calculate_context_aware_semantic_similarity(resume_text: str, job_text: str) -> Tuple[float, float]:
+    """Context-aware semantic similarity using professional document understanding"""
+    
+    # Preprocess texts to emphasize first-person vs requirements
+    resume_processed = preprocess_resume_context(resume_text)
+    job_processed = preprocess_job_context(job_text)
+    
+    # Use context-aware embeddings
+    embeddings = sentence_model.encode([resume_processed, job_processed])
+    similarity = cosine_similarity(embeddings[0:1], embeddings[1:2])[0][0]
+    
+    # Calculate confidence (same as before)
+    confidence = calculate_confidence_score(resume_text, job_text)
+    
+    return float(similarity), float(confidence)
+
+def calculate_mismatch_aware_semantic_similarity(resume_text: str, job_text: str) -> Tuple[float, float]:
+    """Use transformer understanding to detect experience level mismatches"""
     if not sentence_model:
         return 0.0, 0.0
     
     try:
-        # Create embeddings
-        resume_embedding = sentence_model.encode([resume_text])
-        job_embedding = sentence_model.encode([job_text])
+        # Step 1: Get base semantic similarity
+        base_embeddings = sentence_model.encode([resume_text, job_text])
+        base_similarity = cosine_similarity(base_embeddings[0:1], base_embeddings[1:2])[0][0]
         
-        # Calculate cosine similarity
-        similarity = cosine_similarity(resume_embedding, job_embedding)[0][0]
+        # Step 2: Create experience level comparison prompts
+        resume_level_prompt = f"This resume describes someone with: {resume_text[:200]}... What is their seniority level?"
+        job_level_prompt = f"This job posting requires: {job_text[:200]}... What seniority level are they seeking?"
         
-        # Calculate confidence based on text quality and length
+        # Step 3: Compare experience level embeddings
+        level_embeddings = sentence_model.encode([resume_level_prompt, job_level_prompt])
+        level_similarity = cosine_similarity(level_embeddings[0:1], level_embeddings[1:2])[0][0]
+        
+        # Step 4: Create specific mismatch detection prompts
+        mismatch_prompts = [
+            f"Resume: {resume_text[:150]}",
+            f"Job seeking overqualified senior candidate: {job_text[:150]}",
+            f"Job seeking underqualified junior candidate: {job_text[:150]}"
+        ]
+        
+        mismatch_embeddings = sentence_model.encode(mismatch_prompts)
+        
+        # Check if resume matches "overqualified" scenario
+        overqualified_similarity = cosine_similarity(
+            mismatch_embeddings[0:1], mismatch_embeddings[1:2]
+        )[0][0]
+        
+        # Check if resume matches "underqualified" scenario  
+        underqualified_similarity = cosine_similarity(
+            mismatch_embeddings[0:1], mismatch_embeddings[2:3]
+        )[0][0]
+        
+        # Step 5: Apply mismatch penalties
+        mismatch_penalty = 0
+        
+        # If resume seems overqualified for the job
+        if overqualified_similarity > 0.7:
+            mismatch_penalty = -0.2
+        
+        # If resume seems underqualified for the job
+        elif underqualified_similarity > 0.7:
+            mismatch_penalty = -0.3
+        
+        # Step 6: Combine base similarity with level matching and mismatch detection
+        final_similarity = (base_similarity * 0.6) + (level_similarity * 0.4) + mismatch_penalty
+        final_similarity = max(0.0, min(1.0, final_similarity))  # Clamp to [0,1]
+        
+        # Calculate confidence
         confidence = calculate_confidence_score(resume_text, job_text)
         
-        return float(similarity), float(confidence)
+        return float(final_similarity), float(confidence)
+        
     except:
+        return 0.0, 0.0
+    
+def calculate_intelligent_semantic_similarity(resume_text: str, job_text: str) -> Tuple[float, float]:
+    """Use transformer's natural understanding to detect experience mismatches"""
+    if not sentence_model:
+        return 0.0, 0.0
+    
+    try:
+        # Step 1: Base semantic similarity for skills/domain matching
+        base_embeddings = sentence_model.encode([resume_text, job_text])
+        base_similarity = cosine_similarity(base_embeddings[0:1], base_embeddings[1:2])[0][0]
+        
+        # Step 2: Create experience level templates that the model understands
+        experience_templates = {
+            'entry_level': "Entry level position for recent graduate with basic skills and no professional experience",
+            'junior': "Junior developer position requiring 1-2 years experience with mentorship provided", 
+            'mid': "Mid-level engineer position requiring 3-5 years experience with independent work capability",
+            'senior': "Senior engineer position requiring 5+ years experience with leadership and mentoring responsibilities",
+            'lead': "Lead engineer position requiring 8+ years experience with team leadership and architectural decisions",
+            'principal': "Principal engineer position requiring 10+ years experience with strategic technical leadership"
+        }
+        
+        # Step 3: Find which experience level the resume most closely matches
+        resume_level_similarities = {}
+        for level, template in experience_templates.items():
+            template_embedding = sentence_model.encode([template])
+            resume_embedding = sentence_model.encode([resume_text])
+            similarity = cosine_similarity(resume_embedding, template_embedding)[0][0]
+            resume_level_similarities[level] = similarity
+        
+        resume_best_match = max(resume_level_similarities, key=resume_level_similarities.get)
+        resume_confidence = resume_level_similarities[resume_best_match]
+        
+        # Step 4: Find which experience level the job most closely matches
+        job_level_similarities = {}
+        for level, template in experience_templates.items():
+            template_embedding = sentence_model.encode([template])
+            job_embedding = sentence_model.encode([job_text])
+            similarity = cosine_similarity(job_embedding, template_embedding)[0][0]
+            job_level_similarities[level] = similarity
+            
+        job_best_match = max(job_level_similarities, key=job_level_similarities.get)
+        job_confidence = job_level_similarities[job_best_match]
+        
+        # Step 5: Calculate experience level alignment
+        level_hierarchy = ['entry_level', 'junior', 'mid', 'senior', 'lead', 'principal']
+        resume_idx = level_hierarchy.index(resume_best_match)
+        job_idx = level_hierarchy.index(job_best_match)
+        
+        # Step 6: Apply intelligent adjustments based on level matching
+        level_adjustment = 0
+        
+        if resume_idx == job_idx:
+            # Perfect match
+            level_adjustment = 0.1
+        elif resume_idx == job_idx + 1:
+            # Slightly overqualified (good)
+            level_adjustment = 0.05
+        elif resume_idx == job_idx - 1:
+            # Slightly underqualified (acceptable)
+            level_adjustment = -0.05
+        elif resume_idx > job_idx + 1:
+            # Significantly overqualified (might not be interested)
+            level_adjustment = -0.15
+        elif resume_idx < job_idx - 1:
+            # Significantly underqualified (not suitable)
+            level_adjustment = -0.25
+            
+        # Step 7: Weight the confidence of our level detection
+        detection_confidence = (resume_confidence + job_confidence) / 2
+        if detection_confidence < 0.3:
+            # Low confidence in level detection, rely more on base similarity
+            level_adjustment *= 0.3
+        
+        # Step 8: Combine base similarity with intelligent level adjustment
+        final_similarity = base_similarity + level_adjustment
+        final_similarity = max(0.0, min(1.0, final_similarity))
+        
+        # Calculate confidence
+        confidence = calculate_confidence_score(resume_text, job_text)
+        
+        return float(final_similarity), float(confidence)
+        
+    except Exception as e:
+        print(f"Error in intelligent similarity: {e}")
         return 0.0, 0.0
 
 def calculate_confidence_score(resume_text: str, job_text: str) -> float:

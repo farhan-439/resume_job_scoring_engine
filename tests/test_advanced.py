@@ -1,48 +1,72 @@
-from app.scoring import extract_enhanced_experience_level, extract_enhanced_skills_v2, calculate_semantic_similarity_with_confidence, calculate_hybrid_semantic_similarity
+from app.scoring import extract_enhanced_experience_level, extract_enhanced_skills_v2, calculate_hybrid_semantic_similarity, calculate_intelligent_semantic_similarity
 
-# Test data designed to test the semantic matching
-resume_text = "Software developer with 8 years of experience in Python and React. I have led teams and mentored developers. Expert in Django and AWS. Strong background in machine learning."
+# REALISTIC TEST CASES
+print("="*70)
+print("=== INTELLIGENT SEMANTIC SIMILARITY TESTS ===")
+print("="*70)
 
-job_text = "Looking for a senior backend engineer with Python experience and team leadership skills. 5+ years experience required."
+# Test Case 1: Good match
+resume_1 = "Senior software engineer with 8 years Python experience. I have mentored junior developers, led cross-functional teams, and architected microservices. Expert in Django, React, and AWS cloud infrastructure."
+job_1 = "Looking for senior Python developer with leadership experience, 5+ years required, Django and AWS preferred."
 
-# Test the enhanced experience extraction
-print("=== Enhanced Experience Level Extraction ===")
-resume_exp = extract_enhanced_experience_level(resume_text)
-job_exp = extract_enhanced_experience_level(job_text)
+print("\n1. GOOD MATCH TEST:")
+print("Resume: Senior engineer (8 years)")
+print("Job: Looking for senior developer")
 
-print(f"Resume experience: {resume_exp}")
-print(f"Job experience: {job_exp}")
+similarity_hybrid = calculate_hybrid_semantic_similarity(resume_1, job_1)[0]
+similarity_intelligent = calculate_intelligent_semantic_similarity(resume_1, job_1)[0]
 
-print("\n=== Enhanced Skills Extraction V2 ===")
-skills_data = extract_enhanced_skills_v2(resume_text)
-for category, data in skills_data.items():
-    if data['count'] > 0:
-        print(f"{category}: {data['count']} skills")
+print(f"Hybrid similarity:        {similarity_hybrid:.3f}")
+print(f"Intelligent similarity:   {similarity_intelligent:.3f}")
+print(f"Change: {((similarity_intelligent - similarity_hybrid) * 100):+.1f}%")
 
-print("\n=== Semantic Similarity with Confidence ===")
-similarity, confidence = calculate_semantic_similarity_with_confidence(resume_text, job_text)
-print(f"Similarity score: {similarity}")
-print(f"Confidence score: {confidence}")
+# Test Case 2: Underqualified candidate
+resume_2 = "Recent computer science graduate with internship experience. Familiar with Python basics and completed coursework in web development."
+job_2 = "Senior engineer position requiring 5+ years experience, Python expertise, ability to lead teams and architect systems."
 
-# NEW HYBRID TESTS BELOW
-print("\n" + "="*50)
-print("=== HYBRID SEMANTIC SIMILARITY TESTS ===")
-print("="*50)
+print("\n2. UNDERQUALIFIED TEST:")
+print("Resume: Recent graduate")
+print("Job: Senior position (5+ years)")
 
-# Test with high-quality text (should use semantic)
-resume_text_good = "Senior software engineer with 8 years of experience in Python development and React. I have led teams and mentored junior developers. Expert in Django and AWS with strong machine learning background."
+similarity_hybrid_2 = calculate_hybrid_semantic_similarity(resume_2, job_2)[0]
+similarity_intelligent_2 = calculate_intelligent_semantic_similarity(resume_2, job_2)[0]
 
-# Test with poor-quality text (should use hybrid/fallback)
-resume_text_poor = "dev python react 2 yr"
+print(f"Hybrid similarity:        {similarity_hybrid_2:.3f}")
+print(f"Intelligent similarity:   {similarity_intelligent_2:.3f}")
+print(f"Change: {((similarity_intelligent_2 - similarity_hybrid_2) * 100):+.1f}%")
 
-print("\n1. High-quality text (should use semantic):")
-similarity1, confidence1, method1 = calculate_hybrid_semantic_similarity(resume_text_good, job_text)
-print(f"Similarity: {similarity1:.3f}, Confidence: {confidence1:.3f}, Method: {method1}")
+# Test Case 3: Overqualified candidate
+resume_3 = "Principal engineer with 12 years experience leading teams and architecting systems. Expert in Python, Java, distributed systems, and cloud platforms."
+job_3 = "Entry-level position suitable for recent graduates. Basic Python knowledge required. Will provide mentorship and training."
 
-print("\n2. Poor-quality text (should use hybrid fallback):")
-similarity2, confidence2, method2 = calculate_hybrid_semantic_similarity(resume_text_poor, job_text)
-print(f"Similarity: {similarity2:.3f}, Confidence: {confidence2:.3f}, Method: {method2}")
+print("\n3. OVERQUALIFIED TEST:")
+print("Resume: Principal engineer (12 years)")
+print("Job: Entry-level position")
 
-print("\n3. Original text with hybrid method:")
-similarity3, confidence3, method3 = calculate_hybrid_semantic_similarity(resume_text, job_text)
-print(f"Similarity: {similarity3:.3f}, Confidence: {confidence3:.3f}, Method: {method3}")
+similarity_hybrid_3 = calculate_hybrid_semantic_similarity(resume_3, job_3)[0]
+similarity_intelligent_3 = calculate_intelligent_semantic_similarity(resume_3, job_3)[0]
+
+print(f"Hybrid similarity:        {similarity_hybrid_3:.3f}")
+print(f"Intelligent similarity:   {similarity_intelligent_3:.3f}")
+print(f"Change: {((similarity_intelligent_3 - similarity_hybrid_3) * 100):+.1f}%")
+
+# Test Case 4: Slightly overqualified (should be positive)
+resume_4 = "Senior engineer with 7 years experience in Python and team leadership."
+job_4 = "Mid-level developer position requiring 3-5 years experience."
+
+print("\n4. SLIGHTLY OVERQUALIFIED TEST:")
+print("Resume: Senior engineer (7 years)")
+print("Job: Mid-level position (3-5 years)")
+
+similarity_hybrid_4 = calculate_hybrid_semantic_similarity(resume_4, job_4)[0]
+similarity_intelligent_4 = calculate_intelligent_semantic_similarity(resume_4, job_4)[0]
+
+print(f"Hybrid similarity:        {similarity_hybrid_4:.3f}")
+print(f"Intelligent similarity:   {similarity_intelligent_4:.3f}")
+print(f"Change: {((similarity_intelligent_4 - similarity_hybrid_4) * 100):+.1f}%")
+
+print(f"\n=== EXPECTED RESULTS ===")
+print(f"Good match: Should IMPROVE (+)")
+print(f"Underqualified: Should DECREASE significantly (-)")
+print(f"Overqualified: Should DECREASE (-)")
+print(f"Slightly overqualified: Should IMPROVE slightly (+)")
