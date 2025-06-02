@@ -2,11 +2,23 @@
 
 A resume-job matching system implementing best practices from CareerBuilder, LinkedIn, and major recruitment platforms. Achieves 73% semantic similarity for perfect matches with production-ready performance.
 
-My model distinguishes between <span style="color:#5DADE2;">**"5 years Python experience"**</span> vs <span style="color:#5DADE2;">**"familiar with Python basics"**</span>, <span style="color:#5DADE2;">**distinguishes "i am a senior developer"**</span> with <span style="color:#5DADE2;">**"worked with senior developers"**</span> for a "senior" keyword, and <span style="color:#5DADE2;">**connects "team leadership requirements"**</span> with <span style="color:#5DADE2;">**"managed teams of 5+ engineers"**</span>
+Besides the basic semantic match, my model:
 
-<span style="color:#5DADE2;">**Advanced Understanding:**</span> Recognizes <span style="color:#5DADE2;">**skill aliases**</span> (“js” → “javascript”, “k8s” → “kubernetes”), <span style="color:#5DADE2;">**detects compound skills**</span> (“machine learning”, “full stack development”), <span style="color:#5DADE2;">**infers seniority levels**</span> (8 years experience → senior level without explicit mention), <span style="color:#5DADE2;">**understands job title synonyms**</span> (“developer” ≈ “engineer” ≈ “programmer”), <span style="color:#5DADE2;">**extracts technical depth indicators**</span> (“architecture”, “scalability”, “system design”), <span style="color:#5DADE2;">**identifies overqualification scenarios**</span> (“Principal engineer” applying to “entry-level position”), <span style="color:#5DADE2;">**also underqualification scenarios**</span>, ("Recent graduate applying to Senior roles") <span style="color:#5DADE2;">**processes career transitions**</span> (“data scientist” → “backend engineer” with transferable Python skills), <span style="color:#5DADE2;">**weighs skill categories**</span> (programming languages 30% > soft skills 10%), <span style="color:#5DADE2;">**applies company hiring standards**</span> (Google -15 points, startups +10 points), and <span style="color:#5DADE2;">**provides confidence-weighted scoring**</span> with <span style="color:#5DADE2;">** TF-IDF fallback**</span> when semantic confidence is low.
+- Distinguishes **“5 years Python experience”** vs **“familiar with Python basics”**
+- Distinguishes **“i am a senior developer”** vs **“worked with senior developers”** for the “senior” keyword
+- Connects **“team leadership requirements”** with **“managed teams of 5+ engineers”**
+- Recognizes **skill aliases** (“js” → “javascript”, “k8s” → “kubernetes”)
+- Detects **compound skills** (“machine learning”, “full stack development”)
+- Infers **seniority levels** (e.g. 8 years experience → senior level without explicit mention)
+- Understands **job-title synonyms** (“developer” ≈ “engineer” ≈ “programmer”)
+- Extracts **technical depth indicators** (“architecture”, “scalability”, “system design”)
+- Identifies **overqualification scenarios** (“Principal engineer” applying to “entry-level position”) and **underqualification scenarios** (“Recent graduate applying to Senior roles”)
+- Processes **career transitions** (“data scientist” → “backend engineer” with transferable Python skills)
+- Weighs **skill categories** (programming languages 30% > soft skills 10%)
+- Applies **company hiring standards** (Google −15 points, startups +10 points)
+- Provides **confidence-weighted scoring** with **TF-IDF fallback** when semantic confidence is low
 
-**Note:** We only leverage a **local Sentence Transformers model (all-mpnet-base-v2)** to achieve an average response time of about **42 ms (versus 2+ seconds with GPT)** and completely **eliminate per-request costs**. If even **higher semantic accuracy** is required—especially in complex or multimodal scenarios—we can introduce a **second stage that calls the GPT API**. In practice, this **two-stage (or multimodel) setup** lets us perform a **fast, cost-effective local pass** and only incur the **higher latency and expense of GPT** when our **confidence score falls below a certain threshold**.
+**Note:** I only leverage a **local Sentence Transformers model (all-mpnet-base-v2)** to achieve an average response time of about **42 ms (versus 2+ seconds with GPT)** and completely **eliminate per-request costs**. If even **higher semantic accuracy** is required-especially in complex or multimodal scenarios-we can introduce a **second stage that calls the GPT API**. In practice, this **two-stage (or multimodel) setup** will let us perform a **fast, cost-effective local pass** and only incur the **higher latency and expense of GPT** when our **confidence score falls below a certain threshold**.
 
 ## 🚀 Key Features
 
@@ -168,43 +180,6 @@ final_score = confidence_weighted + company_modifier
 result = max(0, min(100, final_score * 100))
 ```
 
-## 🎯 Key Technical Features
-
-### **Production-Ready Architecture**
-
-**Modular Design:**
-
-- `SkillTaxonomy`: Centralized skill standardization
-- `ExperienceAnalyzer`: Advanced career level detection
-- `SemanticMatcher`: Context-aware similarity with fallback
-- `CompanyIntelligence`: Data-driven hiring insights
-- `ResumeJobScorer`: Main orchestration engine
-
-**Reliability Features:**
-
-- **Graceful Degradation**: TF-IDF fallback when transformers fail
-- **Error Handling**: Comprehensive exception management
-- **Input Validation**: Professional text quality checks
-- **Memory Management**: Efficient model loading and caching
-
-### **Deterministic Behavior**
-
-**Consistency Guarantees:**
-
-- **Cache Keys**: MD5-based deterministic hashing
-- **No Randomness**: Reproducible results across sessions
-- **Version Control**: Model and algorithm versioning
-- **Audit Trail**: Complete scoring breakdown for transparency
-
-### **Performance Optimization**
-
-**Speed Optimizations:**
-
-- **Model Caching**: One-time loading with persistent instances
-- **Batch Processing**: Efficient embedding generation
-- **Memory Efficiency**: Lazy loading and cleanup
-- **Preprocessing**: Optimized text analysis pipelines
-
 ## 📊 API Documentation
 
 ### **POST /score**
@@ -213,8 +188,8 @@ result = max(0, min(100, final_score * 100))
 
 ```json
 {
-  "resume_text": "Senior software engineer with 8 years Python experience...",
-  "job_description": "Looking for senior Python developer with leadership...",
+  "resume_text": "Software Engineer with 8 years of professional experience in Python development. I have led cross-functional teams of 9+ developers and architected microservices systems. Expert in Django framework, React frontend development, and AWS cloud infrastructure. I mentored junior developers and managed the technical roadmap for major product releases.",
+  "job_description": "Looking for Senior Python Developer with 5+ years experience. Must have Django and AWS knowledge. Leadership experience preferred. Will be responsible for mentoring team members and system architecture. React experience is a plus. Competitive salary and equity package.",
   "company_name": "Google"
 }
 ```
@@ -223,28 +198,55 @@ result = max(0, min(100, final_score * 100))
 
 ```json
 {
-  "overall_score": 88,
-  "final_score": 56,
-  "semantic_similarity": 0.734,
+  "overall_score": 87,
+  "semantic_similarity": 0.7188412547111511,
   "skills_breakdown": {
     "programming_languages": {
-      "resume_skills": 3,
+      "resume_skills": 2,
       "job_requirements": 2,
-      "score": 100.0,
+      "score": 100,
       "weight": 0.3
+    },
+    "frameworks_libraries": {
+      "resume_skills": 2,
+      "job_requirements": 2,
+      "score": 100,
+      "weight": 0.25
+    },
+    "databases": {
+      "resume_skills": 1,
+      "job_requirements": 1,
+      "score": 100,
+      "weight": 0.2
+    },
+    "cloud_devops": {
+      "resume_skills": 1,
+      "job_requirements": 1,
+      "score": 100,
+      "weight": 0.15
+    },
+    "soft_skills": {
+      "resume_skills": 1,
+      "job_requirements": 2,
+      "score": 50,
+      "weight": 0.1
     }
   },
   "experience_match": {
     "resume_years": 8,
     "resume_level_final": "senior",
     "job_years": 5,
-    "job_level": "senior",
-    "experience_bonus": 15
+    "job_level": "mid",
+    "experience_bonus": 10,
+    "leadership_keywords": 0
   },
   "company_modifier": -15,
-  "explanation": "Skills match: 90.0%, Semantic similarity: 73.4% (semantic, conf: 0.64), Experience match: 97.0%, Company adjustment: -15.0%"
+  "final_score": 41,
+  "explanation": "Skills match: 90.0%, Semantic similarity: 71.9% (semantic, conf: 0.64), Experience match: 97.0%, Company adjustment: -15.0%"
 }
 ```
+
+_need to fix the job requirements part lol_
 
 ## 🧪 Testing & Validation
 
@@ -253,7 +255,7 @@ result = max(0, min(100, final_score * 100))
 Run the complete test suite:
 
 ```bash
-python test_industry_standard.py
+python -m tests.test_advanced
 ```
 
 **Test Coverage:**
@@ -289,7 +291,7 @@ Performance:           24 req/sec, 42ms avg ✅
 
 - **Load Balancer**: Multiple FastAPI instances
 - **Caching**: Redis for distributed caching
-- **Monitoring**: Comprehensive logging and metrics
+- **Monitoring**: Comprehensive logging and metricsgit
 - **Models**: ONNX conversion for edge deployment
 
 ## 🔮 Future Enhancements

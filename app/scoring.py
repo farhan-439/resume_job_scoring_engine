@@ -698,22 +698,33 @@ def calculate_advanced_score(resume_text: str, job_text: str, company_name: str)
     return {
         'overall_score': int(result.overall_score),
         'semantic_similarity': result.semantic_similarity / 100,
-        'skills_breakdown': _format_skills_breakdown(result.breakdown.get('resume_skills', {})),
+        'skills_breakdown': _format_skills_breakdown(
+            result.breakdown.get('resume_skills', {}),
+            result.breakdown.get('job_skills', {})  # ← Pass job skills too!
+        ),
         'experience_match': _format_experience_match(result.breakdown),
         'company_modifier': int(result.company_adjustment),
         'final_score': int(result.final_score),
         'explanation': result.explanation
     }
 
-def _format_skills_breakdown(skills_data: Dict) -> Dict:
+def _format_skills_breakdown(resume_skills: Dict, job_skills: Dict) -> Dict:
     """Format skills data for API compatibility"""
     breakdown = {}
-    for category, skills in skills_data.items():
+    for category in SkillTaxonomy.CATEGORIES.keys():
+        resume_count = len(resume_skills.get(category, []))
+        job_count = len(job_skills.get(category, []))
+        
+        if job_count > 0:
+            score = min(100, (resume_count / job_count) * 100)
+        else:
+            score = 85 if resume_count > 0 else 0
+            
         breakdown[category] = {
-            'resume_skills': len(skills),
-            'job_requirements': 0,  # Would need job skills data
-            'score': 85.0,  # Simplified for compatibility
-            'weight': SkillTaxonomy.CATEGORIES.get(category, {}).get('weight', 0.1)
+            'resume_skills': resume_count,
+            'job_requirements': job_count,  # ← Now correctly calculated!
+            'score': round(score, 1),
+            'weight': SkillTaxonomy.CATEGORIES[category]['weight']
         }
     return breakdown
 
