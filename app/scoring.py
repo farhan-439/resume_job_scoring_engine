@@ -3,8 +3,64 @@ import re
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from typing import List, Tuple, Set, Dict
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity as sklearn_cosine_similarity
 import numpy as np
 
+# Initialize TF-IDF vectorizer for fallback matching
+tfidf_vectorizer = TfidfVectorizer(
+    stop_words='english',
+    ngram_range=(1, 2),  # Include bigrams for better matching
+    max_features=5000,
+    lowercase=True
+)
+
+def calculate_tfidf_similarity(resume_text: str, job_text: str) -> float:
+    """Calculate TF-IDF based similarity as fallback"""
+    try:
+        # Combine texts for fitting vectorizer
+        texts = [resume_text, job_text]
+        
+        # Fit and transform
+        tfidf_matrix = tfidf_vectorizer.fit_transform(texts)
+        
+        # Calculate cosine similarity
+        similarity_matrix = sklearn_cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])
+        
+        return float(similarity_matrix[0][0])
+    except:
+        return 0.0
+
+def calculate_hybrid_semantic_similarity(resume_text: str, job_text: str) -> Tuple[float, float, str]:
+    """
+    Calculate hybrid semantic similarity with intelligent fallback
+    Returns: (similarity_score, confidence, method_used)
+    """
+    # Try semantic similarity first
+    semantic_score, confidence = calculate_semantic_similarity_with_confidence(resume_text, job_text)
+    
+    # Define confidence threshold for fallback
+    CONFIDENCE_THRESHOLD = 0.3
+    
+    if confidence >= CONFIDENCE_THRESHOLD:
+        # High confidence - use semantic similarity
+        return semantic_score, confidence, "semantic"
+    
+    else:
+        # Low confidence - use hybrid approach
+        tfidf_score = calculate_tfidf_similarity(resume_text, job_text)
+        
+        # Weighted combination based on confidence
+        weight_semantic = confidence / CONFIDENCE_THRESHOLD  # 0.0 to 1.0
+        weight_tfidf = 1.0 - weight_semantic
+        
+        hybrid_score = (semantic_score * weight_semantic) + (tfidf_score * weight_tfidf)
+        
+        # Boost confidence slightly for hybrid approach
+        adjusted_confidence = min(confidence + 0.2, 0.8)
+        
+        return hybrid_score, adjusted_confidence, f"hybrid(s:{weight_semantic:.1f},t:{weight_tfidf:.1f})"
+    
 # Skill standardization dictionary - maps aliases to canonical forms
 SKILL_ALIASES = {
     # Programming languages
@@ -299,7 +355,7 @@ def calculate_advanced_score(resume_text: str, job_text: str, company_name: str)
     job_exp = extract_enhanced_experience_level(job_text)
     
     # 2. Calculate semantic similarity with confidence (0-1 scale)
-    semantic_score, confidence = calculate_semantic_similarity_with_confidence(resume_text, job_text)
+    semantic_score, confidence, method = calculate_hybrid_semantic_similarity(resume_text, job_text)
 
     # Apply confidence weighting to semantic score
     confidence_weighted_semantic = semantic_score * confidence
@@ -386,7 +442,8 @@ def calculate_advanced_score(resume_text: str, job_text: str, company_name: str)
     final_score = min(100, max(0, overall_score + company_mod))
     
     # 7. Generate explanation
-    explanation = f"Skills match: {skills_score:.1f}%, Semantic similarity: {semantic_score*100:.1f}% (confidence: {confidence:.2f}), Job title match: {job_title_match*100:.1f}%, Experience bonus: {exp_bonus}, Company modifier: {company_mod}"
+    # Update the explanation string:
+    explanation = f"Skills match: {skills_score:.1f}%, Semantic similarity: {semantic_score*100:.1f}% (confidence: {confidence:.2f}, method: {method}), Job title match: {job_title_match*100:.1f}%, Experience bonus: {exp_bonus}, Company modifier: {company_mod}"
    
     return {
         'overall_score': overall_score,
