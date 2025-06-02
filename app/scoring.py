@@ -5,6 +5,159 @@ from sklearn.metrics.pairwise import cosine_similarity
 from typing import List, Tuple, Set, Dict
 import numpy as np
 
+# Skill standardization dictionary - maps aliases to canonical forms
+SKILL_ALIASES = {
+    # Programming languages
+    'js': 'javascript',
+    'ts': 'typescript', 
+    'py': 'python',
+    'cpp': 'c++',
+    'csharp': 'c#',
+    'golang': 'go',
+    
+    # Frameworks & libraries
+    'reactjs': 'react',
+    'vue.js': 'vue',
+    'vuejs': 'vue',
+    'nodejs': 'node.js',
+    'express.js': 'express',
+    'next.js': 'nextjs',
+    'nuxt.js': 'nuxtjs',
+    
+    # Databases
+    'postgres': 'postgresql',
+    'pg': 'postgresql',
+    'mysql': 'mysql',
+    'mongo': 'mongodb',
+    'elastic': 'elasticsearch',
+    
+    # Cloud & DevOps
+    'k8s': 'kubernetes',
+    'docker': 'docker',
+    'aws': 'amazon web services',
+    'gcp': 'google cloud platform',
+    'azure': 'microsoft azure',
+    'ci/cd': 'continuous integration',
+    
+    # AI/ML
+    'ml': 'machine learning',
+    'ai': 'artificial intelligence',
+    'dl': 'deep learning',
+    'nlp': 'natural language processing',
+    'cv': 'computer vision',
+    
+    # General tech
+    'api': 'application programming interface',
+    'rest': 'representational state transfer',
+    'graphql': 'graph query language',
+    'orm': 'object relational mapping'
+}
+
+# Compound skill patterns - multi-word technical terms
+COMPOUND_SKILLS = [
+    'machine learning', 'artificial intelligence', 'deep learning', 'computer vision',
+    'natural language processing', 'data science', 'data analysis', 'web development',
+    'full stack', 'front end', 'back end', 'software engineering', 'devops engineer',
+    'cloud computing', 'distributed systems', 'microservices architecture',
+    'continuous integration', 'continuous deployment', 'test driven development',
+    'agile methodology', 'scrum master', 'product management', 'project management',
+    'team leadership', 'cross functional', 'problem solving'
+]
+
+def normalize_skill(skill: str) -> str:
+    """Normalize skill to canonical form"""
+    skill_lower = skill.lower().strip()
+    
+    # Check for direct alias match
+    if skill_lower in SKILL_ALIASES:
+        return SKILL_ALIASES[skill_lower]
+    
+    # Check for compound skills
+    for compound in COMPOUND_SKILLS:
+        if compound in skill_lower:
+            return compound.title()
+    
+    # Return original skill in title case
+    return skill.title()
+
+def extract_compound_skills(text: str) -> Set[str]:
+    """Extract compound/multi-word skills from text"""
+    found_compounds = set()
+    text_lower = text.lower()
+    
+    for compound in COMPOUND_SKILLS:
+        if compound in text_lower:
+            found_compounds.add(compound.title())
+    
+    return found_compounds
+
+def extract_enhanced_skills_v2(text: str) -> Dict[str, any]:
+    """Enhanced skill extraction with normalization and compound detection"""
+    skills_by_category = {}
+    text_lower = text.lower()
+    
+    # First, extract compound skills
+    compound_skills = extract_compound_skills(text)
+    
+    for category, data in SKILL_CATEGORIES.items():
+        found_skills = []
+        
+        # Check for single-word skills
+        for skill in data['skills']:
+            normalized_skill = normalize_skill(skill)
+            
+            # Check original skill name
+            if skill in text_lower:
+                skill_context = extract_skill_context(text_lower, skill)
+                found_skills.append({
+                    'skill': normalized_skill,
+                    'context': skill_context,
+                    'matched_as': skill
+                })
+            
+            # Check normalized version
+            elif normalized_skill.lower() in text_lower:
+                skill_context = extract_skill_context(text_lower, normalized_skill.lower())
+                found_skills.append({
+                    'skill': normalized_skill,
+                    'context': skill_context,
+                    'matched_as': normalized_skill
+                })
+        
+        # Add relevant compound skills to appropriate categories
+        category_compounds = []
+        if category == 'programming_languages':
+            category_compounds = [s for s in compound_skills if any(lang in s.lower() for lang in ['programming', 'development'])]
+        elif category == 'soft_skills':
+            category_compounds = [s for s in compound_skills if any(soft in s.lower() for soft in ['leadership', 'management', 'communication', 'problem', 'team'])]
+        elif category == 'cloud_devops':
+            category_compounds = [s for s in compound_skills if any(cloud in s.lower() for cloud in ['cloud', 'devops', 'continuous', 'distributed'])]
+        elif category == 'frameworks_libraries':
+            category_compounds = [s for s in compound_skills if any(fw in s.lower() for fw in ['web', 'full', 'front', 'back'])]
+        
+        for compound in category_compounds:
+            skill_context = extract_skill_context(text_lower, compound.lower())
+            found_skills.append({
+                'skill': compound,
+                'context': skill_context,
+                'matched_as': 'compound'
+            })
+        
+        # Remove duplicates based on skill name
+        unique_skills = {}
+        for skill_data in found_skills:
+            skill_name = skill_data['skill']
+            if skill_name not in unique_skills:
+                unique_skills[skill_name] = skill_data
+        
+        skills_by_category[category] = {
+            'skills': list(unique_skills.values()),
+            'weight': data['weight'],
+            'count': len(unique_skills)
+        }
+    
+    return skills_by_category
+
 
 def get_company_modifier(company_name: str) -> int:
     """Return company reputation modifier"""
@@ -25,8 +178,8 @@ def calculate_advanced_score(resume_text: str, job_text: str, company_name: str)
     """Calculate comprehensive multi-dimensional score"""
     
     # 1. Extract data from both texts
-    resume_skills = extract_enhanced_skills(resume_text)
-    job_skills = extract_enhanced_skills(job_text)
+    resume_skills = extract_enhanced_skills_v2(resume_text)
+    job_skills = extract_enhanced_skills_v2(job_text)
     resume_exp = extract_experience_level(resume_text)
     job_exp = extract_experience_level(job_text)
     
@@ -180,29 +333,6 @@ def extract_experience_level(text: str) -> Dict[str, any]:
     
     return experience_data
 
-def extract_enhanced_skills(text: str) -> Dict[str, any]:
-    """Enhanced skill extraction with categories and context"""
-    skills_by_category = {}
-    text_lower = text.lower()
-    
-    for category, data in SKILL_CATEGORIES.items():
-        found_skills = []
-        for skill in data['skills']:
-            if skill in text_lower:
-                # Try to extract context (years of experience with this skill)
-                skill_context = extract_skill_context(text_lower, skill)
-                found_skills.append({
-                    'skill': skill.title(),
-                    'context': skill_context
-                })
-        
-        skills_by_category[category] = {
-            'skills': found_skills,
-            'weight': data['weight'],
-            'count': len(found_skills)
-        }
-    
-    return skills_by_category
 
 def extract_skill_context(text: str, skill: str) -> Dict[str, any]:
     """Extract context around a skill (years of experience, proficiency level)"""
