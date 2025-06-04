@@ -2,7 +2,7 @@
 
 A resume-job matching system implementing best practices from CareerBuilder, LinkedIn, and major recruitment platforms. Achieves 73% semantic similarity for perfect matches with production-ready performance.
 
-##  Live Demo
+##  Live Demo - ( Switch to full screen)
 <p align="center">
   <video
     src="https://github.com/user-attachments/assets/cb9817f9-8cb1-4da7-89ae-7240368c9e1e"
