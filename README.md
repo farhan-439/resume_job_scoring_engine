@@ -2,6 +2,18 @@
 
 A resume-job matching system implementing best practices from CareerBuilder, LinkedIn, and major recruitment platforms. Achieves 73% semantic similarity for perfect matches with production-ready performance.
 
+## 🎬 Live Demo
+
+<div align="center">
+  <video width="720" controls>
+    <source 
+      src="https://github.com/farhan-439/resume_job_scoring_engine/releases/download/v1.0/vid.mp4" 
+      type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+
 Besides the basic semantic match, my model:
 
 - Distinguishes **“5 years Python experience”** vs **“familiar with Python basics”**
