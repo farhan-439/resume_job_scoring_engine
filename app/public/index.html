@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="AI-powered resume and job description matching tool" />
+    <title>Resume Job Scorer - AI-Powered Matching</title>
+
+    <!-- Favicon and app icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Resume Job Scorer" />
+    <meta property="og:description"
+        content="Get AI-powered insights on how well your resume matches job requirements" />
+    <meta property="og:image" content="%PUBLIC_URL%/social-preview.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Resume Job Scorer" />
+    <meta name="twitter:description"
+        content="Get AI-powered insights on how well your resume matches job requirements" />
+
+    <!-- Preconnect to API -->
+    <link rel="preconnect" href="http://localhost:8000">
+</head>
+
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+
+    <!-- Optional: Add environment detection -->
+    <script>
+        // Development environment detection
+        if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) {
+            // Production environment - you might want to change API URL
+            console.log('Running in production mode');
+        }
+    </script>
+</body>
+
+</html>

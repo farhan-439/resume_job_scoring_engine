@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'React';
 import { ScoringResponse, SkillsBreakdown, ExperienceMatch, Company } from './types';
 
 // Utility function for score color
@@ -240,7 +240,16 @@ export const SkillsBreakdownComponent: React.FC<SkillsBreakdownProps> = ({ skill
     <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '1.5rem', border: '1px solid #e5e7eb' }}>
       <h3 style={{ margin: '0 0 1rem 0', color: '#1f2937', fontSize: '18px' }}>Skills Breakdown</h3>
       <div style={{ display: 'grid', gap: '1rem' }}>
-        {Object.entries(skillsBreakdown).map(([category, data]) => (
+        {Object.entries(skillsBreakdown).map(([category, data]) => {
+          // Type assertion to ensure data has the correct structure
+          const skillData = data as {
+            resume_skills: number;
+            job_requirements: number;
+            score: number;
+            weight: number;
+          };
+          
+          return (
           <div key={category} style={{
             padding: '1rem',
             backgroundColor: '#f9fafb',
@@ -260,15 +269,15 @@ export const SkillsBreakdownComponent: React.FC<SkillsBreakdownProps> = ({ skill
                   borderRadius: '4px',
                   color: '#6b7280'
                 }}>
-                  Weight: {Math.round(data.weight * 100)}%
+                  Weight: {Math.round(skillData.weight * 100)}%
                 </span>
               </div>
               <span style={{ 
                 fontWeight: 'bold', 
-                color: getScoreColor(data.score),
+                color: getScoreColor(skillData.score),
                 fontSize: '16px'
               }}>
-                {Math.round(data.score)}%
+                {Math.round(skillData.score)}%
               </span>
             </div>
             
@@ -281,19 +290,19 @@ export const SkillsBreakdownComponent: React.FC<SkillsBreakdownProps> = ({ skill
               marginBottom: '0.5rem'
             }}>
               <div style={{
-                width: `${Math.min(data.score, 100)}%`,
+                width: `${Math.min(skillData.score, 100)}%`,
                 height: '100%',
-                backgroundColor: getScoreColor(data.score),
+                backgroundColor: getScoreColor(skillData.score),
                 transition: 'width 0.5s ease',
                 borderRadius: '4px'
               }} />
             </div>
             
             <div style={{ fontSize: '12px', color: '#6b7280' }}>
-              Resume: {data.resume_skills} skills | Required: {data.job_requirements} skills
+              Resume: {skillData.resume_skills} skills | Required: {skillData.job_requirements} skills
             </div>
           </div>
-        ))}
+        )});
       </div>
     </div>
   );
