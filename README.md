@@ -2,16 +2,16 @@
 
 A resume-job matching system implementing best practices from CareerBuilder, LinkedIn, and major recruitment platforms. Achieves 73% semantic similarity for perfect matches with production-ready performance.
 
-## 🎬 Live Demo
-
-<div align="center">
-  <video width="720" controls>
-    <source 
-      src="https://github.com/farhan-439/resume_job_scoring_engine/releases/download/v1.0/vid.mp4" 
-      type="video/mp4">
-    Your browser does not support the video tag.
+##  Live Demo
+<p align="center">
+  <video
+    src="https://github.com/user-attachments/assets/cb9817f9-8cb1-4da7-89ae-7240368c9e1e"
+    width="480"
+    height="270"
+    controls>
   </video>
-</div>
+</p>
+
 
 
 Besides the basic semantic match, my model:
