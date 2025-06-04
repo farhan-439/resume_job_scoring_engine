@@ -1,4 +1,4 @@
-from app.backend.scoring import (
+from scoring import (
     extract_enhanced_experience_level, 
     extract_enhanced_skills_v2, 
     calculate_hybrid_semantic_similarity,
