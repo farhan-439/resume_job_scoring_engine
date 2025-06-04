@@ -1,4 +1,4 @@
-import React from 'React';
+import React from 'react';
 import { ScoringResponse, SkillsBreakdown, ExperienceMatch, Company } from './types';
 
 // Utility function for score color
@@ -302,7 +302,9 @@ export const SkillsBreakdownComponent: React.FC<SkillsBreakdownProps> = ({ skill
               Resume: {skillData.resume_skills} skills | Required: {skillData.job_requirements} skills
             </div>
           </div>
-        )});
+        );
+        }
+        )};
       </div>
     </div>
   );
