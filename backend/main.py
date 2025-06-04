@@ -1,9 +1,20 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator
 from typing import List, Dict, Union, Any
-from app.scoring import calculate_advanced_score
+from scoring import calculate_advanced_score  # ← Fixed import
 
 app = FastAPI(title="Resume Job Scoring Engine", version="2.0.0")
+
+# Add CORS middleware for frontend connection
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # React dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Request models
 class JobResumeRequest(BaseModel):
