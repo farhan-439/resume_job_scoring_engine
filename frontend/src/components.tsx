@@ -3,17 +3,10 @@ import { ScoringResponse, SkillsBreakdown, ExperienceMatch, Company, AnalysisIns
 
 // Utility functions
 const getScoreColor = (score: number): string => {
-  if (score >= 80) return '#10b981'; // green
-  if (score >= 60) return '#f59e0b'; // yellow  
-  if (score >= 40) return '#f97316'; // orange
-  return '#ef4444'; // red
-};
-
-const getGradientColor = (score: number): string => {
-  if (score >= 80) return 'linear-gradient(135deg, #10b981, #059669)';
-  if (score >= 60) return 'linear-gradient(135deg, #f59e0b, #d97706)';
-  if (score >= 40) return 'linear-gradient(135deg, #f97316, #ea580c)';
-  return 'linear-gradient(135deg, #ef4444, #dc2626)';
+  if (score >= 80) return '#007AFF'; // Apple blue
+  if (score >= 60) return '#FF9500'; // Apple orange
+  if (score >= 40) return '#FF3B30'; // Apple red
+  return '#8E8E93'; // Apple gray
 };
 
 // Enhanced companies data with more details
@@ -64,185 +57,203 @@ export const InputForm: React.FC<InputFormProps> = ({
   const selectedCompany = POPULAR_COMPANIES.find(c => c.name.toLowerCase() === companyName);
 
   const resumeTips = [
-    "💡 Include specific years of experience with technologies",
-    "🎯 Mention leadership roles and team sizes managed",
-    "🏗️ Add architecture and system design experience",
-    "📊 Include quantifiable achievements and metrics",
-    "🔧 List specific frameworks, tools, and platforms"
+    "Include specific years of experience with technologies",
+    "Mention leadership roles and team sizes managed",
+    "Add architecture and system design experience",
+    "Include quantifiable achievements and metrics",
+    "List specific frameworks, tools, and platforms"
   ];
 
   return (
-    <div style={{ marginBottom: '2rem' }}>
+    <div style={{ marginBottom: '48px' }}>
       {/* Tips Section */}
       <div style={{ 
-        marginBottom: '1.5rem', 
-        padding: '1rem', 
-        backgroundColor: '#f0f9ff', 
-        borderRadius: '8px',
-        border: '1px solid #0ea5e9'
+        marginBottom: '32px', 
+        padding: '24px', 
+        backgroundColor: '#F2F2F7', 
+        borderRadius: '16px',
+        border: 'none'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ margin: 0, color: '#0369a1', fontSize: '16px' }}>
-            🎯 Optimize Your Results
+          <h3 style={{ margin: 0, color: '#1D1D1F', fontSize: '17px', fontWeight: '600' }}>
+            Optimize Your Results
           </h3>
           <button
             onClick={() => setShowTips(!showTips)}
             style={{
               background: 'none',
               border: 'none',
-              color: '#0369a1',
+              color: '#007AFF',
               cursor: 'pointer',
-              fontSize: '14px',
-              textDecoration: 'underline'
+              fontSize: '15px',
+              fontWeight: '400'
             }}
           >
-            {showTips ? 'Hide Tips' : 'Show Tips'}
+            {showTips ? 'Hide' : 'Show'} Tips
           </button>
         </div>
         {showTips && (
-          <div style={{ marginTop: '0.75rem', fontSize: '14px', color: '#0369a1' }}>
+          <div style={{ marginTop: '16px', fontSize: '15px', color: '#86868B' }}>
             {resumeTips.map((tip, index) => (
-              <div key={index} style={{ marginBottom: '0.25rem' }}>{tip}</div>
+              <div key={index} style={{ marginBottom: '8px', paddingLeft: '12px', position: 'relative' }}>
+                <div style={{ 
+                  position: 'absolute', 
+                  left: '0', 
+                  top: '9px', 
+                  width: '4px', 
+                  height: '4px', 
+                  backgroundColor: '#007AFF', 
+                  borderRadius: '50%' 
+                }} />
+                {tip}
+              </div>
             ))}
           </div>
         )}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
         <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#374151' }}>
-            📄 Resume Text
+          <label style={{ display: 'block', marginBottom: '12px', fontWeight: '600', color: '#1D1D1F', fontSize: '17px' }}>
+            Resume Text
           </label>
           <textarea
             value={resumeText}
             onChange={(e) => onResumeChange(e.target.value)}
-            placeholder="Paste your resume content here... Include specific skills, years of experience, leadership roles, and achievements."
+            placeholder="Paste your resume content here..."
             style={{
               width: '100%',
-              height: '320px',
-              padding: '1rem',
-              border: `2px solid ${resumeText.length >= 50 ? '#10b981' : '#e5e7eb'}`,
-              borderRadius: '8px',
-              fontSize: '14px',
+              height: '280px',
+              padding: '16px',
+              border: 'none',
+              borderRadius: '12px',
+              fontSize: '15px',
               resize: 'vertical',
               outline: 'none',
-              transition: 'all 0.2s',
-              fontFamily: 'inherit',
-              lineHeight: '1.5'
+              backgroundColor: '#FFFFFF',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              lineHeight: '1.5',
+              transition: 'box-shadow 0.2s ease'
             }}
-            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-            onBlur={(e) => e.target.style.borderColor = resumeText.length >= 50 ? '#10b981' : '#e5e7eb'}
+            onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 122, 255, 0.2)'}
+            onBlur={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'}
           />
           <div style={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
-            fontSize: '12px', 
-            marginTop: '0.25rem' 
+            fontSize: '13px', 
+            marginTop: '8px',
+            color: '#86868B'
           }}>
-            <span style={{ color: resumeText.length >= 50 ? '#10b981' : '#ef4444' }}>
-              {resumeText.length}/50 characters minimum
+            <span>
+              {resumeText.length >= 50 ? '✓' : '◦'} {resumeText.length}/50 characters minimum
             </span>
-            <span style={{ color: '#6b7280' }}>
-              Words: {resumeText.split(/\s+/).filter(w => w.length > 0).length}
+            <span>
+              {resumeText.split(/\s+/).filter(w => w.length > 0).length} words
             </span>
           </div>
         </div>
 
         <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#374151' }}>
-            💼 Job Description
+          <label style={{ display: 'block', marginBottom: '12px', fontWeight: '600', color: '#1D1D1F', fontSize: '17px' }}>
+            Job Description
           </label>
           <textarea
             value={jobDescription}
             onChange={(e) => onJobChange(e.target.value)}
-            placeholder="Paste the job description here... Include required skills, experience level, and responsibilities."
+            placeholder="Paste the job description here..."
             style={{
               width: '100%',
-              height: '320px',
-              padding: '1rem',
-              border: `2px solid ${jobDescription.length >= 30 ? '#10b981' : '#e5e7eb'}`,
-              borderRadius: '8px',
-              fontSize: '14px',
+              height: '280px',
+              padding: '16px',
+              border: 'none',
+              borderRadius: '12px',
+              fontSize: '15px',
               resize: 'vertical',
               outline: 'none',
-              transition: 'all 0.2s',
-              fontFamily: 'inherit',
-              lineHeight: '1.5'
+              backgroundColor: '#FFFFFF',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              lineHeight: '1.5',
+              transition: 'box-shadow 0.2s ease'
             }}
-            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-            onBlur={(e) => e.target.style.borderColor = jobDescription.length >= 30 ? '#10b981' : '#e5e7eb'}
+            onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 122, 255, 0.2)'}
+            onBlur={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'}
           />
           <div style={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
-            fontSize: '12px', 
-            marginTop: '0.25rem' 
+            fontSize: '13px', 
+            marginTop: '8px',
+            color: '#86868B'
           }}>
-            <span style={{ color: jobDescription.length >= 30 ? '#10b981' : '#ef4444' }}>
-              {jobDescription.length}/30 characters minimum
+            <span>
+              {jobDescription.length >= 30 ? '✓' : '◦'} {jobDescription.length}/30 characters minimum
             </span>
-            <span style={{ color: '#6b7280' }}>
-              Words: {jobDescription.split(/\s+/).filter(w => w.length > 0).length}
+            <span>
+              {jobDescription.split(/\s+/).filter(w => w.length > 0).length} words
             </span>
           </div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'end' }}>
+      <div style={{ display: 'flex', gap: '24px', alignItems: 'end' }}>
         <div style={{ flex: 1 }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#374151' }}>
-            🏢 Company / Organization
+          <label style={{ display: 'block', marginBottom: '12px', fontWeight: '600', color: '#1D1D1F', fontSize: '17px' }}>
+            Company
           </label>
           <select
             value={companyName}
             onChange={(e) => onCompanyChange(e.target.value)}
             style={{
               width: '100%',
-              padding: '0.75rem',
-              border: '2px solid #e5e7eb',
-              borderRadius: '8px',
-              fontSize: '14px',
+              padding: '16px',
+              border: 'none',
+              borderRadius: '12px',
+              fontSize: '15px',
               outline: 'none',
-              backgroundColor: 'white',
-              cursor: 'pointer'
+              backgroundColor: '#FFFFFF',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              cursor: 'pointer',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
             }}
           >
             <option value="unknown">Select Company (Optional)</option>
             <optgroup label="Big Tech">
               {POPULAR_COMPANIES.filter(c => c.category === 'big_tech').map((company) => (
                 <option key={company.name} value={company.name.toLowerCase()}>
-                  {company.name} ({company.modifier}pts)
+                  {company.name}
                 </option>
               ))}
             </optgroup>
             <optgroup label="Unicorns">
               {POPULAR_COMPANIES.filter(c => c.category === 'unicorn').map((company) => (
                 <option key={company.name} value={company.name.toLowerCase()}>
-                  {company.name} ({company.modifier}pts)
+                  {company.name}
                 </option>
               ))}
             </optgroup>
             <optgroup label="Consulting">
               {POPULAR_COMPANIES.filter(c => c.category === 'consulting').map((company) => (
                 <option key={company.name} value={company.name.toLowerCase()}>
-                  {company.name} ({company.modifier}pts)
+                  {company.name}
                 </option>
               ))}
             </optgroup>
             <optgroup label="Startups">
               {POPULAR_COMPANIES.filter(c => c.category === 'startup').map((company) => (
                 <option key={company.name} value={company.name.toLowerCase()}>
-                  {company.name} (+{company.modifier}pts)
+                  {company.name}
                 </option>
               ))}
             </optgroup>
           </select>
           {selectedCompany && (
             <div style={{ 
-              fontSize: '12px', 
-              color: '#6b7280', 
-              marginTop: '0.25rem',
-              fontStyle: 'italic'
+              fontSize: '13px', 
+              color: '#86868B', 
+              marginTop: '8px'
             }}>
               {selectedCompany.description}
             </div>
@@ -253,34 +264,31 @@ export const InputForm: React.FC<InputFormProps> = ({
           onClick={onSubmit}
           disabled={!canSubmit}
           style={{
-            padding: '0.75rem 2rem',
-            background: canSubmit ? getGradientColor(85) : '#9ca3af',
-            color: 'white',
+            padding: '16px 32px',
+            background: canSubmit ? '#007AFF' : '#D1D1D6',
+            color: canSubmit ? 'white' : '#86868B',
             border: 'none',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontWeight: 'bold',
+            borderRadius: '12px',
+            fontSize: '17px',
+            fontWeight: '600',
             cursor: canSubmit ? 'pointer' : 'not-allowed',
-            transition: 'all 0.2s',
+            transition: 'all 0.2s ease',
             minWidth: '140px',
-            boxShadow: canSubmit ? '0 4px 12px rgba(59, 130, 246, 0.3)' : 'none',
-            transform: 'translateY(0)',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
           }}
           onMouseEnter={(e) => {
             if (canSubmit) {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(59, 130, 246, 0.4)';
+              e.currentTarget.style.backgroundColor = '#0056CC';
             }
           }}
           onMouseLeave={(e) => {
             if (canSubmit) {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+              e.currentTarget.style.backgroundColor = '#007AFF';
             }
           }}
         >
           {isLoading ? (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{
                 width: '16px',
                 height: '16px',
@@ -289,87 +297,65 @@ export const InputForm: React.FC<InputFormProps> = ({
                 borderRadius: '50%',
                 animation: 'spin 1s linear infinite'
               }} />
-              Analyzing...
+              Analyzing
             </span>
-          ) : '🚀 Analyze Match'}
+          ) : 'Analyze Match'}
         </button>
       </div>
     </div>
   );
 };
 
-// Enhanced Score Display with Animation
+// Sleek Score Display
 interface ScoreDisplayProps {
   score: number;
   label: string;
-  color?: string;
-  size?: 'small' | 'medium' | 'large';
   subtitle?: string;
-  showProgress?: boolean;
+  size?: 'small' | 'medium' | 'large';
 }
 
 export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({ 
   score, 
   label, 
-  color, 
-  size = 'medium',
   subtitle,
-  showProgress = false
+  size = 'medium'
 }) => {
-  const displayColor = color || getScoreColor(score);
   const sizes = {
-    small: { font: '18px', padding: '0.75rem' },
-    medium: { font: '28px', padding: '1.25rem' },
-    large: { font: '42px', padding: '1.5rem' }
+    small: { font: '20px', padding: '16px' },
+    medium: { font: '32px', padding: '24px' },
+    large: { font: '48px', padding: '32px' }
   };
 
   return (
     <div style={{
       textAlign: 'center',
       padding: sizes[size].padding,
-      backgroundColor: 'white',
+      backgroundColor: '#FFFFFF',
       borderRadius: '16px',
-      border: '1px solid #e5e7eb',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-      position: 'relative',
-      overflow: 'hidden',
+      border: 'none',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
       transition: 'all 0.3s ease'
     }}>
-      {showProgress && (
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          height: '4px',
-          width: `${Math.min(score, 100)}%`,
-          background: getGradientColor(score),
-          transition: 'width 1s ease-out'
-        }} />
-      )}
       <div style={{
         fontSize: sizes[size].font,
-        fontWeight: 'bold',
-        background: getGradientColor(score),
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        marginBottom: '0.5rem',
-        animation: size === 'large' ? 'pulse 2s ease-in-out' : 'none'
+        fontWeight: '700',
+        color: getScoreColor(score),
+        marginBottom: '8px'
       }}>
         {Math.round(score)}%
       </div>
       <div style={{
-        fontSize: '14px',
-        color: '#374151',
+        fontSize: '15px',
+        color: '#1D1D1F',
         fontWeight: '600',
-        marginBottom: subtitle ? '0.25rem' : 0
+        marginBottom: subtitle ? '4px' : 0
       }}>
         {label}
       </div>
       {subtitle && (
         <div style={{
-          fontSize: '12px',
-          color: '#6b7280',
-          fontStyle: 'italic'
+          fontSize: '13px',
+          color: '#86868B'
         }}>
           {subtitle}
         </div>
@@ -378,7 +364,7 @@ export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
   );
 };
 
-// Advanced Skills Breakdown Component
+// Clean Skills Breakdown
 interface SkillsBreakdownProps {
   skillsBreakdown: SkillsBreakdown;
   overallScore: number;
@@ -394,55 +380,25 @@ export const SkillsBreakdownComponent: React.FC<SkillsBreakdownProps> = ({
     return category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
-  const getCategoryIcon = (category: string): string => {
-    const icons: { [key: string]: string } = {
-      'programming_languages': '💻',
-      'frameworks_libraries': '⚡',
-      'databases': '🗄️',
-      'cloud_devops': '☁️',
-      'soft_skills': '🤝'
-    };
-    return icons[category] || '📋';
-  };
-
-  const getCategoryDescription = (category: string): string => {
-    const descriptions: { [key: string]: string } = {
-      'programming_languages': 'Core programming languages and syntax',
-      'frameworks_libraries': 'Frameworks, libraries, and development tools',
-      'databases': 'Database systems and data storage technologies',
-      'cloud_devops': 'Cloud platforms and DevOps infrastructure',
-      'soft_skills': 'Leadership, communication, and interpersonal skills'
-    };
-    return descriptions[category] || 'Technical skills and competencies';
-  };
-
-  const getMatchQuality = (score: number): { label: string; color: string } => {
-    if (score >= 90) return { label: 'Excellent Match', color: '#059669' };
-    if (score >= 75) return { label: 'Strong Match', color: '#10b981' };
-    if (score >= 60) return { label: 'Good Match', color: '#f59e0b' };
-    if (score >= 40) return { label: 'Partial Match', color: '#f97316' };
-    return { label: 'Skills Gap', color: '#ef4444' };
-  };
-
   return (
-    <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h3 style={{ margin: 0, color: '#1f2937', fontSize: '20px', fontWeight: 'bold' }}>
-          🎯 Skills Analysis
+    <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '32px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <h3 style={{ margin: 0, color: '#1D1D1F', fontSize: '22px', fontWeight: '700' }}>
+          Skills Analysis
         </h3>
         <div style={{ 
-          backgroundColor: '#f3f4f6', 
-          padding: '0.5rem 1rem', 
-          borderRadius: '8px',
-          fontSize: '14px',
-          fontWeight: 'bold',
-          color: '#374151'
+          backgroundColor: '#F2F2F7', 
+          padding: '8px 16px', 
+          borderRadius: '20px',
+          fontSize: '15px',
+          fontWeight: '600',
+          color: '#1D1D1F'
         }}>
-          Overall: {Math.round(overallScore)}%
+          {Math.round(overallScore)}%
         </div>
       </div>
 
-      <div style={{ display: 'grid', gap: '1rem' }}>
+      <div style={{ display: 'grid', gap: '16px' }}>
         {Object.entries(skillsBreakdown).map(([category, data]) => {
           const skillData = data as {
             resume_skills: number;
@@ -454,127 +410,108 @@ export const SkillsBreakdownComponent: React.FC<SkillsBreakdownProps> = ({
           };
           
           const isExpanded = expandedCategory === category;
-          const matchQuality = getMatchQuality(skillData.score);
-          const impact = skillData.weight * skillData.score;
           
           return (
             <div key={category} style={{
-              border: '1px solid #f3f4f6',
+              border: '1px solid #F2F2F7',
               borderRadius: '12px',
               overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              backgroundColor: isExpanded ? '#fafafa' : 'white'
+              backgroundColor: '#FFFFFF'
             }}>
               <div 
                 style={{
-                  padding: '1.25rem',
+                  padding: '20px',
                   cursor: 'pointer',
                   transition: 'background-color 0.2s'
                 }}
                 onClick={() => setExpandedCategory(isExpanded ? null : category)}
                 onMouseEnter={(e) => {
-                  if (!isExpanded) e.currentTarget.style.backgroundColor = '#f9fafb';
+                  if (!isExpanded) e.currentTarget.style.backgroundColor = '#FAFAFA';
                 }}
                 onMouseLeave={(e) => {
-                  if (!isExpanded) e.currentTarget.style.backgroundColor = 'white';
+                  if (!isExpanded) e.currentTarget.style.backgroundColor = '#FFFFFF';
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <span style={{ fontSize: '24px' }}>{getCategoryIcon(category)}</span>
-                    <div>
-                      <div style={{ fontWeight: 'bold', color: '#374151', fontSize: '16px' }}>
-                        {formatCategoryName(category)}
-                      </div>
-                      <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '0.25rem' }}>
-                        {getCategoryDescription(category)}
-                      </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div>
+                    <div style={{ fontWeight: '600', color: '#1D1D1F', fontSize: '17px' }}>
+                      {formatCategoryName(category)}
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ 
-                      fontWeight: 'bold', 
+                      fontWeight: '700', 
                       color: getScoreColor(skillData.score),
-                      fontSize: '18px'
+                      fontSize: '20px'
                     }}>
                       {Math.round(skillData.score)}%
-                    </div>
-                    <div style={{ 
-                      fontSize: '11px', 
-                      color: matchQuality.color,
-                      fontWeight: '600'
-                    }}>
-                      {matchQuality.label}
                     </div>
                   </div>
                 </div>
                 
-                <div style={{ marginBottom: '0.75rem' }}>
+                <div style={{ marginBottom: '12px' }}>
                   <div style={{
                     width: '100%',
-                    height: '8px',
-                    backgroundColor: '#f1f5f9',
-                    borderRadius: '4px',
-                    overflow: 'hidden',
-                    position: 'relative'
+                    height: '4px',
+                    backgroundColor: '#F2F2F7',
+                    borderRadius: '2px',
+                    overflow: 'hidden'
                   }}>
                     <div style={{
                       width: `${Math.min(skillData.score, 100)}%`,
                       height: '100%',
-                      background: getGradientColor(skillData.score),
+                      backgroundColor: getScoreColor(skillData.score),
                       transition: 'width 0.8s ease-out',
-                      borderRadius: '4px'
+                      borderRadius: '2px'
                     }} />
                   </div>
                 </div>
                 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', fontSize: '12px' }}>
-                  <div style={{ color: '#059669' }}>
-                    <div style={{ fontWeight: 'bold' }}>Found: {skillData.resume_skills}</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', fontSize: '13px' }}>
+                  <div style={{ color: '#34C759' }}>
+                    <div style={{ fontWeight: '600' }}>Found: {skillData.resume_skills}</div>
                   </div>
-                  <div style={{ color: '#dc2626' }}>
-                    <div style={{ fontWeight: 'bold' }}>Required: {skillData.job_requirements}</div>
+                  <div style={{ color: '#FF3B30' }}>
+                    <div style={{ fontWeight: '600' }}>Required: {skillData.job_requirements}</div>
                   </div>
-                  <div style={{ color: '#7c3aed' }}>
-                    <div style={{ fontWeight: 'bold' }}>Impact: {Math.round(impact)}pts</div>
-                    <div style={{ color: '#6b7280' }}>Weight: {Math.round(skillData.weight * 100)}%</div>
+                  <div style={{ color: '#86868B' }}>
+                    <div style={{ fontWeight: '600' }}>Weight: {Math.round(skillData.weight * 100)}%</div>
                   </div>
                 </div>
 
                 <div style={{ 
-                  marginTop: '0.75rem', 
-                  fontSize: '12px', 
-                  color: '#6b7280',
+                  marginTop: '12px', 
+                  fontSize: '13px', 
+                  color: '#86868B',
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  gap: '0.5rem'
+                  gap: '8px'
                 }}>
-                  <span>{isExpanded ? '▲' : '▼'}</span>
-                  <span>{isExpanded ? 'Hide' : 'Show'} Details</span>
+                  <span>{isExpanded ? '−' : '+'}</span>
+                  <span>{isExpanded ? 'Less' : 'More'}</span>
                 </div>
               </div>
 
               {isExpanded && (
                 <div style={{ 
-                  padding: '1.25rem', 
-                  borderTop: '1px solid #e5e7eb',
-                  backgroundColor: '#f9fafb',
-                  animation: 'slideDown 0.3s ease-out'
+                  padding: '20px', 
+                  borderTop: '1px solid #F2F2F7',
+                  backgroundColor: '#FAFAFA'
                 }}>
                   {skillData.matched_skills && skillData.matched_skills.length > 0 && (
-                    <div style={{ marginBottom: '1rem' }}>
-                      <div style={{ fontWeight: 'bold', color: '#059669', marginBottom: '0.5rem', fontSize: '14px' }}>
-                        ✅ Matched Skills
+                    <div style={{ marginBottom: '16px' }}>
+                      <div style={{ fontWeight: '600', color: '#34C759', marginBottom: '8px', fontSize: '15px' }}>
+                        Matched Skills
                       </div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                         {skillData.matched_skills.map((skill, index) => (
                           <span key={index} style={{
-                            backgroundColor: '#dcfce7',
-                            color: '#166534',
-                            padding: '0.25rem 0.5rem',
-                            borderRadius: '4px',
-                            fontSize: '12px',
+                            backgroundColor: '#D1F2EB',
+                            color: '#00C896',
+                            padding: '4px 12px',
+                            borderRadius: '16px',
+                            fontSize: '13px',
                             fontWeight: '500'
                           }}>
                             {skill}
@@ -586,17 +523,17 @@ export const SkillsBreakdownComponent: React.FC<SkillsBreakdownProps> = ({
                   
                   {skillData.missing_skills && skillData.missing_skills.length > 0 && (
                     <div>
-                      <div style={{ fontWeight: 'bold', color: '#dc2626', marginBottom: '0.5rem', fontSize: '14px' }}>
-                        ❌ Missing Skills
+                      <div style={{ fontWeight: '600', color: '#FF3B30', marginBottom: '8px', fontSize: '15px' }}>
+                        Missing Skills
                       </div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                         {skillData.missing_skills.map((skill, index) => (
                           <span key={index} style={{
-                            backgroundColor: '#fecaca',
-                            color: '#991b1b',
-                            padding: '0.25rem 0.5rem',
-                            borderRadius: '4px',
-                            fontSize: '12px',
+                            backgroundColor: '#FFECEB',
+                            color: '#FF3B30',
+                            padding: '4px 12px',
+                            borderRadius: '16px',
+                            fontSize: '13px',
                             fontWeight: '500'
                           }}>
                             {skill}
@@ -615,7 +552,7 @@ export const SkillsBreakdownComponent: React.FC<SkillsBreakdownProps> = ({
   );
 };
 
-// Enhanced Experience Match Component  
+// Clean Experience Match Component  
 interface ExperienceMatchProps {
   experienceMatch: ExperienceMatch;
 }
@@ -625,250 +562,130 @@ export const ExperienceMatchComponent: React.FC<ExperienceMatchProps> = ({ exper
     return level.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
-  const getLevelIcon = (level: string): string => {
-    const icons: { [key: string]: string } = {
-      'entry': '🌱',
-      'junior': '👨‍💻',
-      'mid': '⚡',
-      'senior': '🎯',
-      'lead': '👑',
-      'principal': '🏆',
-      'executive': '💎'
-    };
-    return icons[level.toLowerCase()] || '👤';
-  };
-
   const getExperienceGap = (): { gap: number; status: string; color: string; message: string } => {
     const gap = experienceMatch.resume_years - experienceMatch.job_years;
     if (gap >= 3) return { 
       gap, 
-      status: 'Overqualified', 
-      color: '#7c3aed', 
+      status: 'Exceeds Requirements', 
+      color: '#007AFF', 
       message: 'Significantly exceeds requirements' 
     };
     if (gap >= 0) return { 
       gap, 
-      status: 'Perfect Match', 
-      color: '#059669', 
+      status: 'Meets Requirements', 
+      color: '#34C759', 
       message: 'Meets or exceeds requirements' 
     };
     if (gap >= -2) return { 
       gap, 
       status: 'Close Match', 
-      color: '#f59e0b', 
+      color: '#FF9500', 
       message: 'Slightly below requirements' 
     };
     return { 
       gap, 
       status: 'Experience Gap', 
-      color: '#dc2626', 
-      message: 'Significantly below requirements' 
+      color: '#FF3B30', 
+      message: 'Below requirements' 
     };
   };
 
   const experienceGap = getExperienceGap();
-  const confidenceScore = (experienceMatch.confidence || 0.7) * 100;
 
   return (
-    <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
-      <h3 style={{ margin: '0 0 1.5rem 0', color: '#1f2937', fontSize: '20px', fontWeight: 'bold' }}>
-        👨‍💼 Experience Analysis
+    <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '32px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+      <h3 style={{ margin: '0 0 24px 0', color: '#1D1D1F', fontSize: '22px', fontWeight: '700' }}>
+        Experience Analysis
       </h3>
       
-      {/* Experience Comparison */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
         <div style={{ 
-          padding: '1.5rem', 
-          background: 'linear-gradient(135deg, #dbeafe, #bfdbfe)',
-          borderRadius: '12px',
-          border: '1px solid #93c5fd',
-          position: 'relative',
-          overflow: 'hidden'
+          padding: '24px', 
+          backgroundColor: '#F2F2F7',
+          borderRadius: '12px'
         }}>
-          <div style={{ 
-            position: 'absolute', 
-            top: '0.5rem', 
-            right: '0.5rem', 
-            fontSize: '24px' 
-          }}>
-            {getLevelIcon(experienceMatch.resume_level_final)}
-          </div>
-          <div style={{ fontSize: '14px', color: '#1e40af', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+          <div style={{ fontSize: '15px', color: '#86868B', fontWeight: '600', marginBottom: '8px' }}>
             Your Experience
           </div>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#1e3a8a', marginBottom: '0.5rem' }}>
-            {experienceMatch.resume_years} years
+          <div style={{ fontSize: '36px', fontWeight: '700', color: '#1D1D1F', marginBottom: '8px' }}>
+            {experienceMatch.resume_years}
           </div>
-          <div style={{ fontSize: '16px', color: '#1e40af', fontWeight: '600' }}>
+          <div style={{ fontSize: '17px', color: '#1D1D1F', fontWeight: '600' }}>
             {formatLevel(experienceMatch.resume_level_final)} Level
           </div>
           {experienceMatch.leadership_keywords > 0 && (
             <div style={{ 
-              marginTop: '0.75rem',
-              fontSize: '12px',
-              color: '#1e40af',
-              backgroundColor: 'rgba(30, 64, 175, 0.1)',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '4px',
+              marginTop: '12px',
+              fontSize: '13px',
+              color: '#007AFF',
+              backgroundColor: '#E3F2FD',
+              padding: '4px 8px',
+              borderRadius: '8px',
               display: 'inline-block'
             }}>
-              👑 {experienceMatch.leadership_keywords} leadership indicators
+              {experienceMatch.leadership_keywords} leadership indicators
             </div>
           )}
         </div>
 
         <div style={{ 
-          padding: '1.5rem', 
-          background: 'linear-gradient(135deg, #dcfce7, #bbf7d0)',
-          borderRadius: '12px',
-          border: '1px solid #86efac',
-          position: 'relative',
-          overflow: 'hidden'
+          padding: '24px', 
+          backgroundColor: '#F2F2F7',
+          borderRadius: '12px'
         }}>
-          <div style={{ 
-            position: 'absolute', 
-            top: '0.5rem', 
-            right: '0.5rem', 
-            fontSize: '24px' 
-          }}>
-            {getLevelIcon(experienceMatch.job_level)}
-          </div>
-          <div style={{ fontSize: '14px', color: '#166534', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+          <div style={{ fontSize: '15px', color: '#86868B', fontWeight: '600', marginBottom: '8px' }}>
             Job Requirements
           </div>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#14532d', marginBottom: '0.5rem' }}>
-            {experienceMatch.job_years}+ years
+          <div style={{ fontSize: '36px', fontWeight: '700', color: '#1D1D1F', marginBottom: '8px' }}>
+            {experienceMatch.job_years}+
           </div>
-          <div style={{ fontSize: '16px', color: '#166534', fontWeight: '600' }}>
+          <div style={{ fontSize: '17px', color: '#1D1D1F', fontWeight: '600' }}>
             {formatLevel(experienceMatch.job_level)} Level
           </div>
         </div>
       </div>
 
-      {/* Experience Gap Analysis */}
       <div style={{
-        padding: '1.25rem',
-        backgroundColor: '#f8fafc',
-        borderRadius: '12px',
-        border: '1px solid #e2e8f0',
-        marginBottom: '1.5rem'
+        padding: '20px',
+        backgroundColor: '#FAFAFA',
+        borderRadius: '12px'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
-            <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#374151' }}>
-              Experience Assessment
+            <div style={{ fontSize: '17px', fontWeight: '600', color: '#1D1D1F' }}>
+              Assessment
             </div>
-            <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '0.25rem' }}>
+            <div style={{ fontSize: '15px', color: '#86868B', marginTop: '4px' }}>
               {experienceGap.message}
             </div>
           </div>
           <div style={{
             backgroundColor: experienceGap.color,
             color: 'white',
-            padding: '0.5rem 1rem',
-            borderRadius: '8px',
-            fontSize: '14px',
-            fontWeight: 'bold'
+            padding: '8px 16px',
+            borderRadius: '20px',
+            fontSize: '15px',
+            fontWeight: '600'
           }}>
             {experienceGap.status}
           </div>
         </div>
 
-        {/* Visual Experience Bar */}
-        <div style={{ position: 'relative', height: '32px', backgroundColor: '#e5e7eb', borderRadius: '16px', overflow: 'hidden' }}>
-          {/* Job requirement marker */}
-          <div style={{
-            position: 'absolute',
-            left: `${Math.min((experienceMatch.job_years / Math.max(experienceMatch.resume_years, experienceMatch.job_years, 10)) * 100, 100)}%`,
-            top: '0',
-            height: '100%',
-            width: '3px',
-            backgroundColor: '#dc2626',
-            zIndex: 2
-          }} />
-          
-          {/* Your experience bar */}
+        <div style={{ position: 'relative', height: '8px', backgroundColor: '#E5E5EA', borderRadius: '4px', overflow: 'hidden' }}>
           <div style={{
             height: '100%',
             width: `${Math.min((experienceMatch.resume_years / Math.max(experienceMatch.resume_years, experienceMatch.job_years, 10)) * 100, 100)}%`,
-            background: getGradientColor(experienceGap.gap >= 0 ? 85 : 45),
-            borderRadius: '16px',
-            display: 'flex',
-            alignItems: 'center',
-            paddingLeft: '1rem',
-            color: 'white',
-            fontSize: '12px',
-            fontWeight: 'bold',
+            backgroundColor: experienceGap.color,
+            borderRadius: '4px',
             transition: 'width 1s ease-out'
-          }}>
-            {experienceMatch.resume_years} years
-          </div>
-          
-          {/* Job requirement label */}
-          <div style={{
-            position: 'absolute',
-            left: `${Math.min((experienceMatch.job_years / Math.max(experienceMatch.resume_years, experienceMatch.job_years, 10)) * 100, 100)}%`,
-            top: '-1.5rem',
-            fontSize: '10px',
-            color: '#dc2626',
-            fontWeight: 'bold',
-            transform: 'translateX(-50%)',
-            whiteSpace: 'nowrap'
-          }}>
-            Required: {experienceMatch.job_years}+
-          </div>
-        </div>
-      </div>
-
-      {/* Technical Depth & Confidence */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-        {experienceMatch.technical_depth !== undefined && (
-          <div style={{ 
-            padding: '1rem', 
-            backgroundColor: '#fef3c7', 
-            borderRadius: '8px',
-            border: '1px solid #fde68a'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <span style={{ fontSize: '18px' }}>🏗️</span>
-              <span style={{ fontSize: '14px', color: '#92400e', fontWeight: 'bold' }}>
-                Technical Depth
-              </span>
-            </div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#92400e' }}>
-              {Math.round(experienceMatch.technical_depth * 100)}%
-            </div>
-            <div style={{ fontSize: '12px', color: '#92400e', marginTop: '0.25rem' }}>
-              Architecture & system design experience
-            </div>
-          </div>
-        )}
-
-        <div style={{ 
-          padding: '1rem', 
-          backgroundColor: '#e0f2fe', 
-          borderRadius: '8px',
-          border: '1px solid #b3e5fc'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-            <span style={{ fontSize: '18px' }}>🎯</span>
-            <span style={{ fontSize: '14px', color: '#0277bd', fontWeight: 'bold' }}>
-              Analysis Confidence
-            </span>
-          </div>
-          <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#0277bd' }}>
-            {Math.round(confidenceScore)}%
-          </div>
-          <div style={{ fontSize: '12px', color: '#0277bd', marginTop: '0.25rem' }}>
-            Data extraction reliability
-          </div>
+          }} />
         </div>
       </div>
     </div>
   );
 };
 
-// Enhanced Semantic Analysis Component
+// Clean Semantic Analysis Component
 interface SemanticAnalysisProps {
   semanticSimilarity: number;
   confidence: number;
@@ -882,96 +699,66 @@ export const SemanticAnalysisComponent: React.FC<SemanticAnalysisProps> = ({
   method, 
   explanation 
 }) => {
-  const getMethodInfo = (method: string): { icon: string; description: string; color: string } => {
-    if (method.includes('semantic')) {
-      return {
-        icon: '🧠',
-        description: 'AI Semantic Understanding',
-        color: '#7c3aed'
-      };
-    }
-    if (method.includes('hybrid')) {
-      return {
-        icon: '⚡',
-        description: 'Hybrid Analysis (AI + Statistical)',
-        color: '#f59e0b'
-      };
-    }
-    return {
-      icon: '📊',
-      description: 'Statistical Analysis (TF-IDF)',
-      color: '#6b7280'
-    };
-  };
-
-  const methodInfo = getMethodInfo(method);
   const similarityScore = semanticSimilarity * 100;
 
   return (
-    <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
-      <h3 style={{ margin: '0 0 1.5rem 0', color: '#1f2937', fontSize: '20px', fontWeight: 'bold' }}>
-        🔍 Semantic Analysis
+    <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '32px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+      <h3 style={{ margin: '0 0 24px 0', color: '#1D1D1F', fontSize: '22px', fontWeight: '700' }}>
+        Semantic Analysis
       </h3>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-        {/* Similarity Score */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
         <div style={{
-          padding: '1.5rem',
-          background: `linear-gradient(135deg, ${methodInfo.color}20, ${methodInfo.color}10)`,
+          padding: '24px',
+          backgroundColor: '#F2F2F7',
           borderRadius: '12px',
-          border: `1px solid ${methodInfo.color}40`,
           textAlign: 'center'
         }}>
-          <div style={{ fontSize: '48px', marginBottom: '0.5rem' }}>{methodInfo.icon}</div>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: methodInfo.color, marginBottom: '0.5rem' }}>
+          <div style={{ fontSize: '36px', fontWeight: '700', color: getScoreColor(similarityScore), marginBottom: '8px' }}>
             {Math.round(similarityScore)}%
           </div>
-          <div style={{ fontSize: '14px', color: methodInfo.color, fontWeight: '600' }}>
+          <div style={{ fontSize: '17px', color: '#1D1D1F', fontWeight: '600' }}>
             Semantic Match
           </div>
         </div>
 
-        {/* Analysis Method */}
         <div style={{
-          padding: '1.5rem',
-          backgroundColor: '#f8fafc',
-          borderRadius: '12px',
-          border: '1px solid #e2e8f0'
+          padding: '24px',
+          backgroundColor: '#F2F2F7',
+          borderRadius: '12px'
         }}>
-          <div style={{ fontSize: '14px', color: '#374151', fontWeight: 'bold', marginBottom: '1rem' }}>
+          <div style={{ fontSize: '15px', color: '#86868B', fontWeight: '600', marginBottom: '16px' }}>
             Analysis Method
           </div>
-          <div style={{ fontSize: '16px', color: methodInfo.color, fontWeight: 'bold', marginBottom: '0.5rem' }}>
-            {methodInfo.description}
+          <div style={{ fontSize: '17px', color: '#1D1D1F', fontWeight: '600', marginBottom: '8px' }}>
+            AI Semantic Understanding
           </div>
-          <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '1rem' }}>
-            Method: {method}
+          <div style={{ fontSize: '13px', color: '#86868B', marginBottom: '16px' }}>
+            {method}
           </div>
           <div style={{
-            backgroundColor: confidence >= 0.7 ? '#dcfce7' : confidence >= 0.4 ? '#fef3c7' : '#fecaca',
-            color: confidence >= 0.7 ? '#166534' : confidence >= 0.4 ? '#92400e' : '#991b1b',
-            padding: '0.5rem',
-            borderRadius: '6px',
-            fontSize: '12px',
-            fontWeight: 'bold',
+            backgroundColor: confidence >= 0.7 ? '#D1F2EB' : confidence >= 0.4 ? '#FFF4E6' : '#FFECEB',
+            color: confidence >= 0.7 ? '#00C896' : confidence >= 0.4 ? '#FF9500' : '#FF3B30',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            fontSize: '13px',
+            fontWeight: '600',
             textAlign: 'center'
           }}>
-            Confidence: {Math.round(confidence * 100)}%
+            {Math.round(confidence * 100)}% Confidence
           </div>
         </div>
       </div>
 
-      {/* Detailed Explanation */}
       <div style={{
-        padding: '1.25rem',
-        backgroundColor: '#f1f5f9',
-        borderRadius: '8px',
-        border: '1px solid #cbd5e1'
+        padding: '20px',
+        backgroundColor: '#FAFAFA',
+        borderRadius: '12px'
       }}>
-        <div style={{ fontSize: '14px', color: '#475569', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-          📋 Analysis Details
+        <div style={{ fontSize: '15px', color: '#1D1D1F', fontWeight: '600', marginBottom: '8px' }}>
+          Analysis Details
         </div>
-        <div style={{ fontSize: '14px', color: '#64748b', lineHeight: '1.5' }}>
+        <div style={{ fontSize: '15px', color: '#86868B', lineHeight: '1.5' }}>
           {explanation}
         </div>
       </div>
@@ -979,7 +766,7 @@ export const SemanticAnalysisComponent: React.FC<SemanticAnalysisProps> = ({
   );
 };
 
-// AI Insights Component
+// Clean AI Insights Component
 interface AIInsightsProps {
   results: ScoringResponse;
 }
@@ -988,16 +775,11 @@ export const AIInsightsComponent: React.FC<AIInsightsProps> = ({ results }) => {
   const generateInsights = (): AnalysisInsight[] => {
     const insights: AnalysisInsight[] = [];
     
-    // Skills insights
-    let totalSkillsFound = 0;
-    let totalSkillsRequired = 0;
     let weakestCategory = '';
     let weakestScore = 100;
     
     Object.entries(results.skills_breakdown).forEach(([category, data]) => {
       const skillData = data as any;
-      totalSkillsFound += skillData.resume_skills;
-      totalSkillsRequired += skillData.job_requirements;
       
       if (skillData.score < weakestScore) {
         weakestScore = skillData.score;
@@ -1005,31 +787,29 @@ export const AIInsightsComponent: React.FC<AIInsightsProps> = ({ results }) => {
       }
     });
 
-    // Generate insights based on analysis
     if (results.final_score >= 80) {
       insights.push({
         type: 'strength',
-        title: 'Excellent Match! 🎉',
+        title: 'Excellent Match',
         description: 'Your profile is a strong match for this position. You exceed most requirements.',
         impact: 'high'
       });
     } else if (results.final_score >= 60) {
       insights.push({
         type: 'suggestion',
-        title: 'Good Foundation 👍',
+        title: 'Good Foundation',
         description: 'Solid match with room for improvement in specific areas.',
         impact: 'medium'
       });
     } else {
       insights.push({
         type: 'warning',
-        title: 'Skills Gap Identified ⚠️',
+        title: 'Skills Gap Identified',
         description: 'Significant gaps exist. Focus on developing key missing skills.',
         impact: 'high'
       });
     }
 
-    // Weakest category insight
     if (weakestScore < 60) {
       insights.push({
         type: 'weakness',
@@ -1039,7 +819,6 @@ export const AIInsightsComponent: React.FC<AIInsightsProps> = ({ results }) => {
       });
     }
 
-    // Experience insights
     const expGap = results.experience_match.resume_years - results.experience_match.job_years;
     if (expGap < -2) {
       insights.push({
@@ -1050,17 +829,15 @@ export const AIInsightsComponent: React.FC<AIInsightsProps> = ({ results }) => {
       });
     }
 
-    // Leadership insights
     if (results.experience_match.leadership_keywords > 0) {
       insights.push({
         type: 'strength',
-        title: 'Leadership Experience Detected 👑',
+        title: 'Leadership Experience Detected',
         description: `Found ${results.experience_match.leadership_keywords} leadership indicators. This is valuable for senior roles.`,
         impact: 'medium'
       });
     }
 
-    // Company-specific insights
     if (results.company_modifier < 0) {
       insights.push({
         type: 'suggestion',
@@ -1070,62 +847,48 @@ export const AIInsightsComponent: React.FC<AIInsightsProps> = ({ results }) => {
       });
     }
 
-    return insights.slice(0, 4); // Limit to 4 insights
+    return insights.slice(0, 4);
   };
 
   const insights = generateInsights();
 
-  const getInsightIcon = (type: AnalysisInsight['type']): string => {
-    const icons = {
-      strength: '💪',
-      weakness: '🔍',
-      suggestion: '💡',
-      warning: '⚠️'
-    };
-    return icons[type];
-  };
-
   const getInsightColor = (type: AnalysisInsight['type']): string => {
     const colors = {
-      strength: '#059669',
-      weakness: '#dc2626',
-      suggestion: '#0ea5e9',
-      warning: '#f59e0b'
+      strength: '#34C759',
+      weakness: '#FF3B30',
+      suggestion: '#007AFF',
+      warning: '#FF9500'
     };
     return colors[type];
   };
 
   return (
-    <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '2rem', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
-      <h3 style={{ margin: '0 0 1.5rem 0', color: '#1f2937', fontSize: '20px', fontWeight: 'bold' }}>
-        🤖 AI-Powered Insights
+    <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '32px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+      <h3 style={{ margin: '0 0 24px 0', color: '#1D1D1F', fontSize: '22px', fontWeight: '700' }}>
+        Key Insights
       </h3>
 
-      <div style={{ display: 'grid', gap: '1rem' }}>
+      <div style={{ display: 'grid', gap: '16px' }}>
         {insights.map((insight, index) => (
           <div key={index} style={{
-            padding: '1.25rem',
-            backgroundColor: `${getInsightColor(insight.type)}08`,
-            border: `1px solid ${getInsightColor(insight.type)}20`,
+            padding: '20px',
+            backgroundColor: '#FAFAFA',
             borderRadius: '12px',
             borderLeft: `4px solid ${getInsightColor(insight.type)}`
           }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-              <span style={{ fontSize: '20px', marginTop: '0.125rem' }}>
-                {getInsightIcon(insight.type)}
-              </span>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
               <div style={{ flex: 1 }}>
                 <div style={{ 
-                  fontWeight: 'bold', 
-                  color: getInsightColor(insight.type), 
-                  marginBottom: '0.5rem',
-                  fontSize: '15px'
+                  fontWeight: '600', 
+                  color: '#1D1D1F', 
+                  marginBottom: '8px',
+                  fontSize: '17px'
                 }}>
                   {insight.title}
                 </div>
                 <div style={{ 
-                  color: '#374151', 
-                  fontSize: '14px',
+                  color: '#86868B', 
+                  fontSize: '15px',
                   lineHeight: '1.5'
                 }}>
                   {insight.description}
@@ -1134,10 +897,10 @@ export const AIInsightsComponent: React.FC<AIInsightsProps> = ({ results }) => {
               <div style={{
                 backgroundColor: getInsightColor(insight.type),
                 color: 'white',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '4px',
-                fontSize: '10px',
-                fontWeight: 'bold',
+                padding: '4px 8px',
+                borderRadius: '8px',
+                fontSize: '11px',
+                fontWeight: '600',
                 textTransform: 'uppercase'
               }}>
                 {insight.impact}
@@ -1150,7 +913,7 @@ export const AIInsightsComponent: React.FC<AIInsightsProps> = ({ results }) => {
   );
 };
 
-// Enhanced Main Results Component
+// Clean Main Results Component
 interface ResultsDisplayProps {
   results: ScoringResponse;
 }
@@ -1161,16 +924,8 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results }) => {
       <style>
         {`
           @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-          }
-          @keyframes slideDown {
-            from { max-height: 0; opacity: 0; }
-            to { max-height: 500px; opacity: 1; }
           }
           @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -1181,77 +936,59 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results }) => {
       
       {/* Hero Score Section */}
       <div style={{ 
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        backgroundColor: '#FFFFFF',
         borderRadius: '20px',
-        padding: '2rem',
-        marginBottom: '2rem',
-        color: 'white',
+        padding: '48px 32px',
+        marginBottom: '32px',
         textAlign: 'center',
-        position: 'relative',
-        overflow: 'hidden'
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
       }}>
-        <div style={{
-          position: 'absolute',
-          top: '-50%',
-          right: '-50%',
-          width: '200%',
-          height: '200%',
-          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
-          animation: 'pulse 4s ease-in-out infinite'
-        }} />
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <h2 style={{ margin: '0 0 1rem 0', fontSize: '24px', opacity: 0.9 }}>
-            Resume Match Analysis Complete! 🎯
-          </h2>
-          <div style={{ fontSize: '72px', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-            {Math.round(results.final_score)}%
-          </div>
-          <div style={{ fontSize: '18px', opacity: 0.9, marginBottom: '1rem' }}>
-            Final Match Score
-          </div>
-          <div style={{ fontSize: '14px', opacity: 0.8, maxWidth: '600px', margin: '0 auto' }}>
-            {results.explanation}
-          </div>
+        <h2 style={{ margin: '0 0 24px 0', fontSize: '28px', color: '#86868B', fontWeight: '400' }}>
+          Match Analysis Complete
+        </h2>
+        <div style={{ fontSize: '96px', fontWeight: '800', marginBottom: '16px', color: getScoreColor(results.final_score) }}>
+          {Math.round(results.final_score)}%
+        </div>
+        <div style={{ fontSize: '22px', color: '#1D1D1F', fontWeight: '600', marginBottom: '16px' }}>
+          Overall Match Score
+        </div>
+        <div style={{ fontSize: '17px', color: '#86868B', maxWidth: '600px', margin: '0 auto', lineHeight: '1.5' }}>
+          {results.explanation}
         </div>
       </div>
 
       {/* Score Breakdown */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
         <ScoreDisplay 
           score={results.overall_score} 
           label="Base Score" 
           subtitle="Before adjustments"
-          showProgress={true}
         />
         <ScoreDisplay 
           score={results.semantic_similarity * 100} 
           label="Semantic Match" 
           subtitle="AI understanding"
-          showProgress={true}
         />
         <ScoreDisplay 
           score={results.company_modifier + 50} 
           label="Company Factor" 
           subtitle={results.company_modifier >= 0 ? 'Bonus applied' : 'Standards applied'}
-          color={results.company_modifier >= 0 ? '#10b981' : '#f59e0b'}
-          showProgress={true}
         />
         <ScoreDisplay 
           score={(results.breakdown?.confidence || 0.7) * 100} 
           label="Confidence" 
           subtitle="Analysis reliability"
-          showProgress={true}
         />
       </div>
 
       {/* Detailed Analysis Grid */}
-      <div style={{ display: 'grid', gap: '2rem' }}>
+      <div style={{ display: 'grid', gap: '32px' }}>
         <SkillsBreakdownComponent 
           skillsBreakdown={results.skills_breakdown} 
           overallScore={results.overall_score}
         />
         
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
           <ExperienceMatchComponent experienceMatch={results.experience_match} />
           <SemanticAnalysisComponent 
             semanticSimilarity={results.semantic_similarity}
@@ -1267,47 +1004,36 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results }) => {
   );
 };
 
-// Enhanced Loading Component
+// Clean Loading Component
 export const LoadingSpinner: React.FC = () => (
   <div style={{
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: '4rem',
+    padding: '64px',
     flexDirection: 'column',
-    gap: '1.5rem'
+    gap: '24px'
   }}>
-    <div style={{ position: 'relative' }}>
-      <div style={{
-        width: '60px',
-        height: '60px',
-        border: '4px solid #e5e7eb',
-        borderTop: '4px solid #3b82f6',
-        borderRadius: '50%',
-        animation: 'spin 1s linear infinite'
-      }} />
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        fontSize: '20px'
-      }}>
-        🧠
-      </div>
-    </div>
+    <div style={{
+      width: '40px',
+      height: '40px',
+      border: '3px solid #F2F2F7',
+      borderTop: '3px solid #007AFF',
+      borderRadius: '50%',
+      animation: 'spin 1s linear infinite'
+    }} />
     <div style={{ textAlign: 'center' }}>
-      <div style={{ color: '#374151', fontSize: '18px', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-        AI Analysis in Progress...
+      <div style={{ color: '#1D1D1F', fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>
+        Analyzing your match
       </div>
-      <div style={{ color: '#6b7280', fontSize: '14px' }}>
-        Analyzing semantic similarity, skills match, and experience alignment
+      <div style={{ color: '#86868B', fontSize: '17px' }}>
+        This may take a moment
       </div>
     </div>
   </div>
 );
 
-// Enhanced Error Component
+// Clean Error Component
 interface ErrorDisplayProps {
   error: string;
   onRetry?: () => void;
@@ -1315,17 +1041,16 @@ interface ErrorDisplayProps {
 
 export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, onRetry }) => (
   <div style={{
-    backgroundColor: '#fef2f2',
-    border: '1px solid #fecaca',
+    backgroundColor: '#FFFFFF',
+    border: '1px solid #FF3B30',
     borderRadius: '12px',
-    padding: '1.5rem',
-    margin: '1rem 0'
+    padding: '24px',
+    margin: '16px 0'
   }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-      <span style={{ fontSize: '24px' }}>🚨</span>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
       <div>
-        <strong style={{ color: '#dc2626', fontSize: '16px' }}>Analysis Failed</strong>
-        <div style={{ color: '#7f1d1d', fontSize: '14px', marginTop: '0.25rem' }}>
+        <strong style={{ color: '#FF3B30', fontSize: '17px', fontWeight: '600' }}>Analysis Failed</strong>
+        <div style={{ color: '#86868B', fontSize: '15px', marginTop: '4px' }}>
           {error}
         </div>
       </div>
@@ -1334,20 +1059,20 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, onRetry }) =>
       <button
         onClick={onRetry}
         style={{
-          backgroundColor: '#dc2626',
+          backgroundColor: '#FF3B30',
           color: 'white',
           border: 'none',
-          padding: '0.75rem 1.5rem',
+          padding: '12px 24px',
           borderRadius: '8px',
           cursor: 'pointer',
-          fontSize: '14px',
-          fontWeight: 'bold',
+          fontSize: '15px',
+          fontWeight: '600',
           transition: 'all 0.2s'
         }}
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b91c1c'}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#D70015'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FF3B30'}
       >
-        🔄 Try Again
+        Try Again
       </button>
     )}
   </div>
